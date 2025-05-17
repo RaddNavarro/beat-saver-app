@@ -1,12 +1,13 @@
 import { Text, View, Button } from "react-native";
 import { Props } from "../../navigation/props";
+import { Container, SignUpText } from "./SignUpStyles";
 
 const SignUp: React.FC<Props> = ({ navigation }) => {
   return (
-    <View>
-      <Text>SignUp</Text>
+    <Container>
+      <SignUpText>SignUp</SignUpText>
       <Button title="Log In" onPress={() => navigation.navigate("LogIn")} />
-    </View>
+    </Container>
   );
 };
 
