@@ -1,4 +1,14 @@
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  SafeAreaView,
+  StatusBar,
+  KeyboardAvoidingView,
+} from "react-native";
+// import { SafeAreaView } from "react-native-safe-area-context";
 import styled from "styled-components";
 
 export const Container = styled(View)`
@@ -6,6 +16,12 @@ export const Container = styled(View)`
   justify-content: center;
   align-items: center;
   background-color: rgb(245, 245, 245);
+`;
+
+export const KeyboardContainer = styled(KeyboardAvoidingView)`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const SignUpText = styled(Text)`
@@ -44,4 +60,17 @@ export const BtnText = styled(Text)`
   color: white;
   font-weight: 700;
   font-size: 16px;
+`;
+
+export const LoadingContainer = styled(SafeAreaView)`
+  flex: 1;
+  background-color: #f5f5f5;
+  padding-top: ${StatusBar.currentHeight};
+  justify-content: center;
+  align-items: center;
+`;
+
+export const Loading = styled(ActivityIndicator)`
+  size: large;
+  color: #0000ff;
 `;

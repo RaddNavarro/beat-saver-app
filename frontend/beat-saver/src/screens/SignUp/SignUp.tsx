@@ -1,4 +1,4 @@
-import { Text, View, Button } from "react-native";
+import { Text, View, Button, Alert } from "react-native";
 import { Props } from "../../navigation/props";
 import {
   Btn,
@@ -7,27 +7,48 @@ import {
   Container,
   InputContainer,
   InputText,
+  KeyboardContainer,
+  Loading,
+  LoadingContainer,
   SignUpText,
 } from "./SignUpStyles";
 import { useState } from "react";
-import { auth } from "../../db/firebase";
+import { AUTH } from "../../db/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const SignUp: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const auth = AUTH;
 
   const handleRegister = async () => {
-    const res = await auth.createUserWithEmailAndPassword(email, password);
-
+    setIsLoading(true);
     try {
-      console.log(res);
+      const response = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      Alert.alert("User Created");
+      console.log(response);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  if (isLoading) {
+    <LoadingContainer>
+      <Loading />
+      <Text>Loading...</Text>
+    </LoadingContainer>;
+  }
+
   return (
-    <Container>
+    <KeyboardContainer behavior="padding">
       <SignUpText>SignUp</SignUpText>
       <InputContainer>
         <InputText
@@ -44,13 +65,13 @@ const SignUp: React.FC<Props> = ({ navigation }) => {
       </InputContainer>
 
       <BtnContainer>
-        <Btn>
+        <Btn onPress={handleRegister}>
           <BtnText>Register</BtnText>
         </Btn>
       </BtnContainer>
 
       <Button title="Log In" onPress={() => navigation.navigate("LogIn")} />
-    </Container>
+    </KeyboardContainer>
   );
 };
 
