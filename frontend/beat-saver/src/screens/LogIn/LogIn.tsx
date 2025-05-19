@@ -65,10 +65,12 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
   });
 
   if (isLoading) {
-    <LoadingContainer>
-      <Loading />
-      <Text>Loading...</Text>
-    </LoadingContainer>;
+    return (
+      <LoadingContainer>
+        <Loading />
+        <Text>Loading...</Text>
+      </LoadingContainer>
+    );
   }
 
   return (
@@ -116,7 +118,14 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
           </>
         )}
       </Formik>
-      <Button title="Sign Up" onPress={() => navigation.navigate("SignUp")} />
+      <Button
+        title="CreateTeens"
+        onPress={() => navigation.navigate("CreateTeens")}
+      />
+      <Button
+        title="CreateParents"
+        onPress={() => navigation.navigate("CreateParents")}
+      />
     </Container>
   );
 };

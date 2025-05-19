@@ -2,17 +2,36 @@ import React, { useEffect, useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import LogIn from "../screens/LogIn/LogIn";
-import SignUp from "../screens/SignUp/SignUp";
-import Profile from "../screens/TeenScreens/Profile/Profile";
+import ProfileTeen from "../screens/TeenScreens/Profile/Profile";
+import ProfileParent from "../screens/ParentScreens/Profile/Profile";
+import ProfileAdmin from "../screens/AdminScreens/Profile/Profile";
 import { onAuthStateChanged, User } from "@firebase/auth";
 import { AUTH } from "../db/firebase";
+import CreateTeens from "../screens/ParentScreens/CreateTeen/CreateTeens";
+import CreateParents from "../screens/AdminScreens/CreateParents/CreateParents";
 
 const Stack = createNativeStackNavigator();
 const NestedStack = createNativeStackNavigator();
 function NestedLayoutTeen() {
   return (
     <NestedStack.Navigator>
-      <NestedStack.Screen name="ProfileTeen" component={Profile} />
+      <NestedStack.Screen name="ProfileTeen" component={ProfileTeen} />
+    </NestedStack.Navigator>
+  );
+}
+
+function NestedLayoutParent() {
+  return (
+    <NestedStack.Navigator>
+      <NestedStack.Screen name="ProfileParent" component={ProfileParent} />
+    </NestedStack.Navigator>
+  );
+}
+
+function NestedLayoutAdmin() {
+  return (
+    <NestedStack.Navigator>
+      <NestedStack.Screen name="ProfileAdmin" component={ProfileAdmin} />
     </NestedStack.Navigator>
   );
 }
@@ -22,7 +41,6 @@ const AppNavigator = () => {
 
   useEffect(() => {
     onAuthStateChanged(AUTH, (user) => {
-      console.log("user", user);
       setUser(user);
     });
   }, []);
@@ -38,8 +56,13 @@ const AppNavigator = () => {
           />
         ) : (
           <>
-            <Stack.Screen name="LogIn" component={LogIn} />
-            <Stack.Screen name="SignUp" component={SignUp} />
+            <Stack.Screen
+              name="LogIn"
+              component={LogIn}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name="CreateTeens" component={CreateTeens} />
+            <Stack.Screen name="CreateParents" component={CreateParents} />
           </>
         )}
       </Stack.Navigator>
