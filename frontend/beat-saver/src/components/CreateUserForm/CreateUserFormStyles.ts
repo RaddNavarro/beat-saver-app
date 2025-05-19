@@ -24,7 +24,7 @@ export const KeyboardContainer = styled(KeyboardAvoidingView)`
   align-items: center;
 `;
 
-export const SignUpText = styled(Text)`
+export const FormText = styled(Text)`
   font-size: 24px;
   color: #4a90e2;
 `;
