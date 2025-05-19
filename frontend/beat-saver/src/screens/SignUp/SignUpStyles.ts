@@ -41,6 +41,14 @@ export const InputText = styled(TextInput)`
   margin-top: 5px;
 `;
 
+export const ErrorText = styled(Text)`
+  color: #e00000;
+  font-weight: bold;
+  margin-bottom: 10px;
+  margin-top: 6px;
+  text-align: center;
+`;
+
 export const BtnContainer = styled(View)`
   width: 60%;
   justify-content: center;

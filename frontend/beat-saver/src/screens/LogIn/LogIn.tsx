@@ -1,4 +1,6 @@
 import { Text, View, Button, Alert } from "react-native";
+import { Formik } from "formik";
+import * as yup from "yup";
 import { Props } from "../../navigation/props";
 import {
   LogInText,
@@ -10,6 +12,7 @@ import {
   BtnText,
   LoadingContainer,
   Loading,
+  ErrorText,
 } from "./LogInStyles";
 import { AUTH } from "../../db/firebase";
 import { signInWithEmailAndPassword } from "@firebase/auth";
@@ -17,12 +20,12 @@ import { useState } from "react";
 import { FirebaseError } from "firebase/app";
 
 const LogIn: React.FC<Props> = ({ navigation }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const auth = AUTH;
 
-  const handleLogIn = async () => {
+  const handleLogIn = async (email: string, password: string) => {
     if (!email || !password) {
       Alert.alert("Error", "Please enter both email and password");
       return;
@@ -56,6 +59,11 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
     }
   };
 
+  const LogInSchema = yup.object({
+    email: yup.string().required().email(),
+    password: yup.string().required().min(7).lowercase(),
+  });
+
   if (isLoading) {
     <LoadingContainer>
       <Loading />
@@ -66,22 +74,48 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
   return (
     <Container>
       <LogInText>LogIn Page</LogInText>
-      <InputContainer>
-        <InputText placeholder="Email" value={email} onChangeText={setEmail} />
-        <InputText
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-      </InputContainer>
-      <Text>{email}</Text>
-      <Text>{password}</Text>
-      <BtnContainer>
-        <Btn onPress={handleLogIn}>
-          <BtnText>Log In</BtnText>
-        </Btn>
-      </BtnContainer>
+      <Formik
+        initialValues={{
+          email: "",
+          password: "",
+        }}
+        validationSchema={LogInSchema}
+        onSubmit={(values, actions) => {
+          // setEmail(values.email);
+          // setPassword(values.password);
+          handleLogIn(values.email, values.password);
+          actions.resetForm();
+        }}
+      >
+        {(props) => (
+          <>
+            <InputContainer>
+              <InputText
+                placeholder="Email"
+                value={props.values.email}
+                onChangeText={props.handleChange("email")}
+                onBlur={props.handleBlur("email")}
+              />
+              <ErrorText>{props.touched.email && props.errors.email}</ErrorText>
+              <InputText
+                placeholder="Password"
+                value={props.values.password}
+                onChangeText={props.handleChange("password")}
+                secureTextEntry
+                onBlur={props.handleBlur("password")}
+              />
+              <ErrorText>
+                {props.touched.password && props.errors.password}
+              </ErrorText>
+            </InputContainer>
+            <BtnContainer>
+              <Btn onPress={() => props.handleSubmit()}>
+                <BtnText>Login</BtnText>
+              </Btn>
+            </BtnContainer>
+          </>
+        )}
+      </Formik>
       <Button title="Sign Up" onPress={() => navigation.navigate("SignUp")} />
     </Container>
   );
