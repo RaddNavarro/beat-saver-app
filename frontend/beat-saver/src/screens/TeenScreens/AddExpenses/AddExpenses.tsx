@@ -18,6 +18,9 @@ const AddExpenses = () => {
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("Food");
+export default function NumPadAdder() {
+  const [currentInput, setCurrentInput] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('Food');
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [description, setDescription] = useState("");
 
@@ -79,6 +82,8 @@ const AddExpenses = () => {
 
   const toggleHistory = () => {
     setShowHistory(!showHistory);
+    setCurrentInput('');
+    setDescription('');
   };
 
   const toggleCategoryDropdown = () => {
@@ -108,12 +113,11 @@ const AddExpenses = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      {/* Total Display */}
       <View style={styles.totalDisplay}>
         <Text style={styles.totalText}>{formatCurrency(total)}</Text>
       </View>
 
-      {/* Current Input Display */}
+      
       <View style={styles.inputDisplay}>
         <Text style={styles.inputText}>
           {currentInput
@@ -122,7 +126,6 @@ const AddExpenses = () => {
         </Text>
       </View>
 
-      {/* Category Selection Dropdown */}
       <View style={styles.categoryContainer}>
         <Text style={styles.categoryLabel}>Category:</Text>
         <TouchableOpacity
@@ -133,7 +136,6 @@ const AddExpenses = () => {
           <Text style={styles.dropdownIcon}>▼</Text>
         </TouchableOpacity>
 
-        {/* Dropdown Modal */}
         <Modal
           transparent={true}
           visible={showCategoryDropdown}
@@ -177,7 +179,6 @@ const AddExpenses = () => {
         </Modal>
       </View>
 
-      {/* Description Input */}
       <View style={styles.descriptionContainer}>
         <TextInput
           style={styles.descriptionInput}
@@ -189,7 +190,6 @@ const AddExpenses = () => {
       </View>
 
       <View style={styles.actionsRow}>
-        {/* History Toggle Button */}
         <TouchableOpacity
           style={styles.historyToggle}
           onPress={toggleHistory}
@@ -200,13 +200,15 @@ const AddExpenses = () => {
           </Text>
         </TouchableOpacity>
 
-        {/* Clear All Button */}
         <TouchableOpacity
           style={styles.clearAllToggle}
+
+        <TouchableOpacity 
+          style={styles.clearAllButton} 
           onPress={handleClearAll}
           activeOpacity={0.7}
         >
-          <Text style={styles.clearAllToggleText}>Clear All</Text>
+          <Text style={styles.clearAllButtonText}>Clear All</Text>
         </TouchableOpacity>
       </View>
 
@@ -241,6 +243,7 @@ const AddExpenses = () => {
         </View>
       )}
 
+      
       {/* Number Pad */}
       <View style={styles.keypadContainer}>
         <View style={styles.row}>
@@ -281,7 +284,7 @@ const AddExpenses = () => {
     </SafeAreaView>
   );
 };
-
+}
 export default AddExpenses;
 
 const styles = StyleSheet.create({
@@ -309,8 +312,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 12,
-    marginHorizontal: 10,
-    marginBottom: 10,
+    margin: 10,
     height: 50,
   },
   inputText: {
@@ -420,11 +422,13 @@ const styles = StyleSheet.create({
   },
   clearAllToggle: {
     backgroundColor: "#e9ecef",
+  },
+  clearAllButton: {
+    backgroundColor: '#e9ecef',
     padding: 10,
     borderRadius: 8,
     alignItems: "center",
     flex: 1,
-    marginLeft: 5,
   },
   clearAllToggleText: {
     color: "#dc3545",
@@ -485,8 +489,14 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 14,
   },
+  clearAllButtonText: {
+    color: '#dc3545',
+    fontWeight: '500',
+    fontSize: 14,
+  },
   keypadContainer: {
     padding: 5,
+    flex: 1, // Take up remaining space
   },
   row: {
     flexDirection: "row",
