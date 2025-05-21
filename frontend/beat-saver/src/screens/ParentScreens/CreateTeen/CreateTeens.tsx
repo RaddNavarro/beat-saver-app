@@ -13,7 +13,7 @@ import {
   Btn,
   BtnContainer,
   BtnText,
-  Container,
+  Content,
   ErrorText,
   InputContainer,
   InputText,
@@ -21,6 +21,7 @@ import {
   Loading,
   LoadingContainer,
   CreateTeensText,
+  SafeArea,
 } from "./CreateTeensStyles";
 import { useState } from "react";
 import { AUTH, DB } from "../../../db/firebase";
@@ -72,13 +73,17 @@ const CreateTeens: React.FC<Props> = ({ navigation }) => {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardContainer behavior="padding">
-        <CreateTeensText>SignUp</CreateTeensText>
-        <CreateUserForm navigation={navigation} addTeenUser={addTeenUser} />
-        <Button title="Log In" onPress={() => navigation.navigate("LogIn")} />
-      </KeyboardContainer>
-    </TouchableWithoutFeedback>
+    <SafeArea>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardContainer behavior="padding">
+          <Content>
+            <CreateTeensText>Create new teen</CreateTeensText>
+            <CreateUserForm navigation={navigation} addTeenUser={addTeenUser} />
+          </Content>
+          {/* <Button title="Log In" onPress={() => navigation.navigate("LogIn")} /> */}
+        </KeyboardContainer>
+      </TouchableWithoutFeedback>
+    </SafeArea>
   );
 };
 

@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   SafeAreaView,
   StatusBar,
   Text,
@@ -9,33 +10,51 @@ import {
 } from "react-native";
 import styled from "styled-components";
 
-export const Container = styled(View)`
+export const Content = styled(View)`
+  padding-horizontal: 30px;
+`;
+
+export const SafeArea = styled(SafeAreaView)`
+  flex: 1;
+  background-color: #ffffff;
+`;
+
+export const KeyboardContainer = styled(KeyboardAvoidingView)`
   flex: 1;
   justify-content: center;
   align-items: center;
-  background-color: rgb(245, 245, 245);
 `;
 
 export const LogInText = styled(Text)`
-  font-size: 24px;
-  color: #4a90e2;
+  font-size: 30px;
+  font-weight: bold;
+  margin-bottom: 40px;
 `;
 
 export const InputContainer = styled(View)`
-  width: 80%;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  position: relative;
+  background-color: #ffffff;
+`;
+
+export const Icon = styled(View)`
+  margin-right: 15px;
 `;
 
 export const InputText = styled(TextInput)`
-  background-color: white;
-  padding-horizontal: 15px;
-  padding-vertical: 10px;
-  border-radius: 10px;
-  margin-top: 5px;
+  border-bottom-width: 1.5px;
+  flex: 1;
+  padding-bottom: 10px;
+  border-bottom-color: #eeeeee;
+  font-size: 16px;
 `;
 
 export const ErrorText = styled(Text)`
   color: #e00000;
-  font-weight: bold;
   margin-bottom: 10px;
   margin-top: 6px;
   text-align: center;
@@ -49,23 +68,28 @@ export const BtnContainer = styled(View)`
 `;
 
 export const Btn = styled(TouchableOpacity)`
-  background-color: #0782f9;
-  width: 100%;
-  padding: 15px;
+  background-color: #3662aa;
+  padding: 14px;
   border-radius: 10px;
-  align-items: center;
+  margin-top: 20px;
 `;
 
 export const BtnText = styled(Text)`
-  color: white;
+  color: #ffffff;
+  text-align: center;
   font-weight: 700;
   font-size: 16px;
+`;
+
+export const PasswordVisibleBtn = styled(TouchableOpacity)`
+  position: absolute;
+  right: 0px;
 `;
 
 export const LoadingContainer = styled(SafeAreaView)`
   flex: 1;
   background-color: #f5f5f5;
-  padding-top: ${StatusBar.currentHeight};
+  padding-top: ${StatusBar.currentHeight}px;
   justify-content: center;
   align-items: center;
 `;

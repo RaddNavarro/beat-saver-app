@@ -1,10 +1,18 @@
-import { Text, View, Button, Alert } from "react-native";
+import {
+  Text,
+  View,
+  Button,
+  Alert,
+  TouchableWithoutFeedback,
+  Keyboard,
+  TouchableOpacity,
+} from "react-native";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { Props } from "../../navigation/props";
 import {
   LogInText,
-  Container,
+  Content,
   InputContainer,
   InputText,
   BtnContainer,
@@ -13,28 +21,31 @@ import {
   LoadingContainer,
   Loading,
   ErrorText,
+  KeyboardContainer,
+  SafeArea,
+  Icon,
+  PasswordVisibleBtn,
 } from "./LogInStyles";
+import Feather from "@expo/vector-icons/Feather";
 import { AUTH } from "../../db/firebase";
 import { signInWithEmailAndPassword } from "@firebase/auth";
 import { useState } from "react";
 import { FirebaseError } from "firebase/app";
 
 const LogIn: React.FC<Props> = ({ navigation }) => {
-  // const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const auth = AUTH;
+  const [visiblePassword, setVisiblePassword] = useState(false);
 
   const handleLogIn = async (email: string, password: string) => {
     if (!email || !password) {
       Alert.alert("Error", "Please enter both email and password");
       return;
     }
+
     setIsLoading(true);
+
     try {
-      const response = await signInWithEmailAndPassword(auth, email, password);
-      console.log("bruh");
-      console.log(response.user.uid);
+      await signInWithEmailAndPassword(AUTH, email, password);
     } catch (error) {
       const firebaseError = error as FirebaseError;
       console.log("Login error:", firebaseError.code, firebaseError.message);
@@ -60,8 +71,11 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
   };
 
   const LogInSchema = yup.object({
-    email: yup.string().required().email(),
-    password: yup.string().required().min(7).lowercase(),
+    email: yup
+      .string()
+      .required("Please enter an email")
+      .email("Please enter a valid email"),
+    password: yup.string().required("Please enter a password"),
   });
 
   if (isLoading) {
@@ -74,59 +88,84 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
   }
 
   return (
-    <Container>
-      <LogInText>LogIn Page</LogInText>
-      <Formik
-        initialValues={{
-          email: "",
-          password: "",
-        }}
-        validationSchema={LogInSchema}
-        onSubmit={(values, actions) => {
-          // setEmail(values.email);
-          // setPassword(values.password);
-          handleLogIn(values.email, values.password);
-          actions.resetForm();
-        }}
-      >
-        {(props) => (
-          <>
-            <InputContainer>
-              <InputText
-                placeholder="Email"
-                value={props.values.email}
-                onChangeText={props.handleChange("email")}
-                onBlur={props.handleBlur("email")}
-              />
-              <ErrorText>{props.touched.email && props.errors.email}</ErrorText>
-              <InputText
-                placeholder="Password"
-                value={props.values.password}
-                onChangeText={props.handleChange("password")}
-                secureTextEntry
-                onBlur={props.handleBlur("password")}
-              />
-              <ErrorText>
-                {props.touched.password && props.errors.password}
-              </ErrorText>
-            </InputContainer>
-            <BtnContainer>
-              <Btn onPress={() => props.handleSubmit()}>
-                <BtnText>Login</BtnText>
-              </Btn>
-            </BtnContainer>
-          </>
-        )}
-      </Formik>
-      <Button
-        title="CreateTeens"
-        onPress={() => navigation.navigate("CreateTeens")}
-      />
-      <Button
-        title="CreateParents"
-        onPress={() => navigation.navigate("CreateParents")}
-      />
-    </Container>
+    <SafeArea>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardContainer>
+          <Content>
+            <LogInText>Login</LogInText>
+            <Formik
+              initialValues={{
+                email: "",
+                password: "",
+              }}
+              validationSchema={LogInSchema}
+              onSubmit={(values, actions) => {
+                handleLogIn(values.email, values.password);
+                actions.resetForm();
+              }}
+            >
+              {(props) => (
+                <>
+                  <InputContainer>
+                    <Icon>
+                      <Feather name="mail" size={22} color="#7C807D" />
+                    </Icon>
+                    <InputText
+                      placeholder="Email address"
+                      placeholderTextColor="#7C807D"
+                      selectionColor="#3662AA"
+                      value={props.values.email}
+                      onChangeText={props.handleChange("email")}
+                      onBlur={props.handleBlur("email")}
+                    />
+                  </InputContainer>
+                  <ErrorText>
+                    {props.touched.email && props.errors.email}
+                  </ErrorText>
+                  <InputContainer>
+                    <Icon>
+                      <Feather name="lock" size={22} color="#7C807D" />
+                    </Icon>
+                    <InputText
+                      placeholder="Password"
+                      placeholderTextColor="#7C807D"
+                      selectionColor="#3662AA"
+                      value={props.values.password}
+                      onChangeText={props.handleChange("password")}
+                      secureTextEntry={!visiblePassword}
+                      onBlur={props.handleBlur("password")}
+                    />
+                    <PasswordVisibleBtn
+                      onPress={() => setVisiblePassword(!visiblePassword)}
+                    >
+                      <Feather
+                        name={visiblePassword ? "eye" : "eye-off"}
+                        size={20}
+                        color="#7C807D"
+                      />
+                    </PasswordVisibleBtn>
+                  </InputContainer>
+                  <ErrorText>
+                    {props.touched.password && props.errors.password}
+                  </ErrorText>
+                  <Btn onPress={() => props.handleSubmit()}>
+                    <BtnText>Login</BtnText>
+                  </Btn>
+                </>
+              )}
+            </Formik>
+            <Button
+              title="Create Teen Account"
+              onPress={() => navigation.navigate("CreateTeens")}
+            />
+            <Button
+              title="Create Parent Account"
+              onPress={() => navigation.navigate("CreateParents")}
+            />
+          </Content>
+        </KeyboardContainer>
+      </TouchableWithoutFeedback>
+    </SafeArea>
   );
 };
 

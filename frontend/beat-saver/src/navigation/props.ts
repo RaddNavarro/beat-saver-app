@@ -27,3 +27,7 @@ export interface CreateUserFormProps extends Props {
   addParentUser?: Parent;
   addTeenUser?: Teen;
 }
+
+export interface UserProps {
+  user: any;
+}

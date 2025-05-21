@@ -11,11 +11,8 @@ import {
 // import { SafeAreaView } from "react-native-safe-area-context";
 import styled from "styled-components";
 
-export const Container = styled(View)`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  background-color: rgb(245, 245, 245);
+export const Content = styled(View)`
+  padding-horizontal: 30px;
 `;
 
 export const KeyboardContainer = styled(KeyboardAvoidingView)`
@@ -24,9 +21,15 @@ export const KeyboardContainer = styled(KeyboardAvoidingView)`
   align-items: center;
 `;
 
+export const SafeArea = styled(SafeAreaView)`
+  flex: 1;
+  background-color: #ffffff;
+`;
+
 export const CreateTeensText = styled(Text)`
-  font-size: 24px;
-  color: #4a90e2;
+  font-size: 30px;
+  font-weight: bold;
+  margin-bottom: 40px;
 `;
 
 export const InputContainer = styled(View)`

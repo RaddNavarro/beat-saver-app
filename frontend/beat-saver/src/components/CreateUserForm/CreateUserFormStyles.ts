@@ -18,6 +18,11 @@ export const Container = styled(View)`
   background-color: rgb(245, 245, 245);
 `;
 
+export const SafeArea = styled(SafeAreaView)`
+  flex: 1;
+  background-color: #ffffff;
+`;
+
 export const KeyboardContainer = styled(KeyboardAvoidingView)`
   flex: 1;
   justify-content: center;
@@ -30,20 +35,33 @@ export const FormText = styled(Text)`
 `;
 
 export const InputContainer = styled(View)`
-  width: 80%;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  position: relative;
+`;
+
+export const Icon = styled(View)`
+  margin-right: 15px;
 `;
 
 export const InputText = styled(TextInput)`
-  background-color: white;
-  padding-horizontal: 15px;
-  padding-vertical: 10px;
-  border-radius: 10px;
-  margin-top: 5px;
+  border-bottom-width: 1.5px;
+  flex: 1;
+  padding-bottom: 10px;
+  border-bottom-color: #eeeeee;
+  font-size: 16px;
+`;
+
+export const PasswordVisibleBtn = styled(TouchableOpacity)`
+  position: absolute;
+  right: 0px;
 `;
 
 export const ErrorText = styled(Text)`
   color: #e00000;
-  font-weight: bold;
   margin-bottom: 10px;
   margin-top: 6px;
   text-align: center;
@@ -57,15 +75,15 @@ export const BtnContainer = styled(View)`
 `;
 
 export const Btn = styled(TouchableOpacity)`
-  background-color: #0782f9;
-  width: 100%;
-  padding: 15px;
+  background-color: #3662aa;
+  padding: 14px;
   border-radius: 10px;
-  align-items: center;
+  margin-top: 20px;
 `;
 
 export const BtnText = styled(Text)`
-  color: white;
+  color: #ffffff;
+  text-align: center;
   font-weight: 700;
   font-size: 16px;
 `;
