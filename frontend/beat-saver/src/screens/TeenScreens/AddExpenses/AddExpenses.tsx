@@ -14,9 +14,6 @@ import {
 
 export default function NumPadAdder() {
   const [currentInput, setCurrentInput] = useState('');
-  const [total, setTotal] = useState(0);
-  const [history, setHistory] = useState([]);
-  const [showHistory, setShowHistory] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('Food');
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [description, setDescription] = useState('');
@@ -33,18 +30,6 @@ export default function NumPadAdder() {
     
     const value = parseFloat(currentInput);
     if (!isNaN(value)) {
-      // Add the current value to history with the selected category and description
-      const newHistoryItem = {
-        value: value,
-        category: selectedCategory,
-        description: description,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      
-      // Update the total and history
-      setTotal(prevTotal => prevTotal + value);
-      setHistory(prevHistory => [...prevHistory, newHistoryItem]);
-      
       // Clear the current input and description
       setCurrentInput('');
       setDescription('');
@@ -70,12 +55,6 @@ export default function NumPadAdder() {
   const handleClearAll = () => {
     setCurrentInput('');
     setDescription('');
-    setTotal(0);
-    setHistory([]);
-  };
-
-  const toggleHistory = () => {
-    setShowHistory(!showHistory);
   };
 
   const toggleCategoryDropdown = () => {
@@ -107,11 +86,6 @@ export default function NumPadAdder() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
-      
-      {/* Total Display */}
-      <View style={styles.totalDisplay}>
-        <Text style={styles.totalText}>{formatCurrency(total)}</Text>
-      </View>
       
       {/* Current Input Display */}
       <View style={styles.inputDisplay}>
@@ -183,51 +157,15 @@ export default function NumPadAdder() {
       </View>
 
       <View style={styles.actionsRow}>
-        {/* History Toggle Button */}
-        <TouchableOpacity 
-          style={styles.historyToggle} 
-          onPress={toggleHistory}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.historyToggleText}>
-            {showHistory ? 'Hide History' : 'Show History'}
-          </Text>
-        </TouchableOpacity>
-
         {/* Clear All Button */}
         <TouchableOpacity 
-          style={styles.clearAllToggle} 
+          style={styles.clearAllButton} 
           onPress={handleClearAll}
           activeOpacity={0.7}
         >
-          <Text style={styles.clearAllToggleText}>Clear All</Text>
+          <Text style={styles.clearAllButtonText}>Clear All</Text>
         </TouchableOpacity>
       </View>
-
-      {/* History Section - Conditionally Rendered */}
-      {showHistory && (
-        <View style={styles.historyContainer}>
-          <Text style={styles.historyTitle}>History</Text>
-          {history.length > 0 ? (
-            <ScrollView style={styles.historyList}>
-              {history.map((item, index) => (
-                <View key={index} style={styles.historyItem}>
-                  <View style={styles.historyItemLeft}>
-                    <Text style={styles.historyTime}>{item.timestamp}</Text>
-                    <Text style={styles.historyItemCategory}>{item.category}</Text>
-                    {item.description ? (
-                      <Text style={styles.historyItemDescription}>{item.description}</Text>
-                    ) : null}
-                  </View>
-                  <Text style={styles.historyValue}>{formatCurrency(item.value)}</Text>
-                </View>
-              ))}
-            </ScrollView>
-          ) : (
-            <Text style={styles.emptyHistoryText}>No entries yet</Text>
-          )}
-        </View>
-      )}
       
       {/* Number Pad */}
       <View style={styles.keypadContainer}>
@@ -265,28 +203,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f9fa',
   },
-  totalDisplay: {
-    padding: 15,
-    backgroundColor: '#212529',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 12,
-    margin: 10,
-    height: 80,
-  },
-  totalText: {
-    color: 'white',
-    fontSize: 38,
-    fontWeight: '600',
-  },
   inputDisplay: {
     padding: 10,
     backgroundColor: '#343a40',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12,
-    marginHorizontal: 10,
-    marginBottom: 10,
+    margin: 10,
     height: 50,
   },
   inputText: {
@@ -381,88 +304,21 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginBottom: 10,
   },
-  historyToggle: {
-    backgroundColor: '#8a2be2',
-    padding: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    flex: 1,
-    marginRight: 5,
-  },
-  historyToggleText: {
-    color: 'white',
-    fontWeight: '500',
-    fontSize: 14,
-  },
-  clearAllToggle: {
+  clearAllButton: {
     backgroundColor: '#e9ecef',
     padding: 10,
     borderRadius: 8,
     alignItems: 'center',
     flex: 1,
-    marginLeft: 5,
   },
-  clearAllToggleText: {
+  clearAllButtonText: {
     color: '#dc3545',
     fontWeight: '500',
     fontSize: 14,
   },
-  historyContainer: {
-    flex: 1,
-    backgroundColor: 'white',
-    borderRadius: 12,
-    margin: 10,
-    padding: 10,
-    maxHeight: 200, // Increased to accommodate description text
-  },
-  historyTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 10,
-    color: '#212529',
-  },
-  historyList: {
-    flex: 1,
-  },
-  historyItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start', // Changed to align at top for descriptions
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
-  },
-  historyItemLeft: {
-    flex: 1,
-  },
-  historyTime: {
-    color: '#6c757d',
-    fontSize: 12,
-  },
-  historyItemCategory: {
-    color: '#343a40',
-    fontSize: 14,
-    fontWeight: '400',
-  },
-  historyItemDescription: {
-    color: '#6c757d',
-    fontSize: 12,
-    fontStyle: 'italic',
-    marginTop: 2,
-  },
-  historyValue: {
-    color: '#212529',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  emptyHistoryText: {
-    color: '#6c757d',
-    textAlign: 'center',
-    marginTop: 20,
-    fontSize: 14,
-  },
   keypadContainer: {
     padding: 5,
+    flex: 1, // Take up remaining space
   },
   row: {
     flexDirection: 'row',
