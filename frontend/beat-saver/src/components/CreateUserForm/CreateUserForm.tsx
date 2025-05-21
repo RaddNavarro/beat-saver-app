@@ -21,7 +21,10 @@ import {
   Loading,
   LoadingContainer,
   FormText,
+  Icon,
+  PasswordVisibleBtn,
 } from "./CreateUserFormStyles";
+import Feather from "@expo/vector-icons/Feather";
 import { useState } from "react";
 import { AUTH, DB } from "../../db/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -40,6 +43,7 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({
 }) => {
   const [userId, setUserId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [visiblePassword, setVisiblePassword] = useState(false);
   const auth = AUTH;
 
   const handleRegister = async (email: string, password: string) => {
@@ -62,10 +66,16 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({
   };
 
   const FormsSchema = yup.object({
-    email: yup.string().required().email(),
-    password: yup.string().required().min(7).lowercase(),
-    firstName: yup.string().required(),
-    lastName: yup.string().required(),
+    email: yup
+      .string()
+      .required("Please enter an email")
+      .email("Please enter a valid email"),
+    password: yup
+      .string()
+      .required("Please enter a password")
+      .min(7, "Please enter a mininum of 7 characters"),
+    firstName: yup.string().required("Please your a first name"),
+    lastName: yup.string().required("Please enter a last name"),
   });
 
   if (isLoading) {
@@ -121,41 +131,50 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({
                 onChangeText={props.handleChange("firstName")}
                 onBlur={props.handleBlur("firstName")}
               />
-              <ErrorText>
-                {props.touched.firstName && props.errors.firstName}
-              </ErrorText>
+            </InputContainer>
+            <ErrorText>
+              {props.touched.firstName && props.errors.firstName}
+            </ErrorText>
+            <InputContainer>
               <InputText
                 placeholder="Last Name"
                 value={props.values.lastName}
                 onChangeText={props.handleChange("lastName")}
                 onBlur={props.handleBlur("lastName")}
               />
-              <ErrorText>
-                {props.touched.lastName && props.errors.lastName}
-              </ErrorText>
+            </InputContainer>
+            <ErrorText>
+              {props.touched.lastName && props.errors.lastName}
+            </ErrorText>
+            <InputContainer>
               <InputText
                 placeholder="Email"
                 value={props.values.email}
                 onChangeText={props.handleChange("email")}
                 onBlur={props.handleBlur("email")}
               />
-              <ErrorText>{props.touched.email && props.errors.email}</ErrorText>
+            </InputContainer>
+            <ErrorText>{props.touched.email && props.errors.email}</ErrorText>
+            <InputContainer>
               <InputText
                 placeholder="Password"
                 value={props.values.password}
                 onChangeText={props.handleChange("password")}
-                secureTextEntry
+                secureTextEntry={visiblePassword ? false : true}
                 onBlur={props.handleBlur("password")}
               />
-              <ErrorText>
-                {props.touched.password && props.errors.password}
-              </ErrorText>
+              <PasswordVisibleBtn
+                onPress={() => setVisiblePassword(!visiblePassword)}
+              >
+                <Feather name="eye-off" size={20} color="#7C807D" />
+              </PasswordVisibleBtn>
             </InputContainer>
-            <BtnContainer>
-              <Btn onPress={() => props.handleSubmit()}>
-                <BtnText>Add A New User</BtnText>
-              </Btn>
-            </BtnContainer>
+            <ErrorText>
+              {props.touched.password && props.errors.password}
+            </ErrorText>
+            <Btn onPress={() => props.handleSubmit()}>
+              <BtnText>Add A New User</BtnText>
+            </Btn>
           </>
         )}
       </Formik>
