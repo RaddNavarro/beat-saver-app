@@ -1,5 +1,5 @@
 import { NavigationProp, Route, RouteProp } from "@react-navigation/native";
-
+import { Modal as RNModal, ModalProps } from "react-native";
 export interface Props {
   navigation: NavigationProp<any>;
 }
@@ -78,3 +78,8 @@ export interface KeypadButtonTextProps {
 export interface FlexSpacerProps {
   size?: number;
 }
+
+export type PROPS = ModalProps & {
+  isOpen: boolean;
+  withInput?: boolean;
+};

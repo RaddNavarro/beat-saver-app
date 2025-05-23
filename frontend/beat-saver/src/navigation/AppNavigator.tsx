@@ -52,6 +52,7 @@ function NestedLayoutAdmin() {
       <NestedStack.Screen name="Dashboard" component={Dashboard} />
       <NestedStack.Screen name="ProfileAdmin" component={ProfileAdmin} />
       <NestedStack.Screen name="ParentInfo" component={ParentInfo} />
+      <NestedStack.Screen name="CreateParents" component={CreateParents} />
     </NestedStack.Navigator>
   );
 }
@@ -84,7 +85,7 @@ const AppNavigator = () => {
         }
 
         setIsAuthChanging(false);
-      }, 300);
+      }, 500);
     });
 
     return () => {

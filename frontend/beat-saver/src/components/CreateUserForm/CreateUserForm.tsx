@@ -163,7 +163,6 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({
     );
 
     if (!uid) {
-      // Reset password field on error
       setCurrentUserPassword("");
       return;
     }
@@ -189,6 +188,11 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({
     if (navigation && addTeenUser) {
       // Navigate back to the parent's home screen
       navigation.navigate("HomeParent");
+    }
+
+    if (navigation && addParentUser) {
+      // Navigate back to the parent's home screen
+      navigation.navigate("Dashboard");
     }
   };
 
