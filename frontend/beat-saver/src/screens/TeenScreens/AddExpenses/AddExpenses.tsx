@@ -1,335 +1,595 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from 'react';
 import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
   Modal,
-  TouchableWithoutFeedback,
-  Dimensions,
-  StatusBar,
-  EmitterSubscription,
-} from "react-native";
+  TextInput,
+  Alert,
+  SafeAreaView,
+  Platform,
+} from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Props } from '../../../navigation/props';
+import { AddButtonText, BalanceAmount, BalanceCard, BalanceHeader, BalanceLabel, CancelButtonText, Container, Emoji, FormGroup, Greeting, Header2, IncomeExpenseItem, IncomeExpenseLabel, IncomeExpenseRow, Label, ModalContent, ModalOverlay, ModalTitle, MoreIcon, ScrollContainer, SectionTitle, TransactionCategory, TransactionDate, TransactionDescription, TransactionDetails, TransactionLeft, TransactionRight, TransactionsSection } from './AddExpensesStyles';
+import { Username } from '../../AdminScreens/Dashboard/UserList/UserItemStyles';
 
-import {
-  ActionsRow,
-  CategoryContainer,
-  CategoryLabel,
-  ClearAllButton,
-  ClearAllButtonText,
-  ClearAllToggle,
-  Container,
-  DescriptionContainer,
-  DescriptionInput,
-  DropdownButton,
-  DropdownButtonText,
-  DropdownIcon,
-  DropdownItem,
-  DropdownItemText,
-  DropdownList,
-  EmptyHistoryText,
-  FlexSpacer,
-  HistoryContainer,
-  HistoryItem,
-  HistoryItemCategory,
-  HistoryItemDescription,
-  HistoryItemLeft,
-  HistoryList,
-  HistoryTime,
-  HistoryTitle,
-  HistoryToggle,
-  HistoryToggleText,
-  HistoryValue,
-  InputText,
-  InputView,
-  KeypadButton,
-  KeypadButtonText,
-  KeypadContainer,
-  KeypadRow,
-  ModalOverlay,
-  TotalText,
-  TotalView,
-} from "./AddExpensesStyles";
-import { HistoryItemProps, Props } from "../../../navigation/props";
+const ExpenseTracker: React.FC <Props> = ({navigation}) => {
+  const [transactions, setTransactions] = useState([
+    {
+      id: 1,
+      type: 'expense',
+      category: 'Dining',
+      description: 'ate pizza',
+      amount: -810,
+      date: '28 Dec',
+      emoji: '🍕',
+      color: '#8B5CF6'
+    },
+    {
+      id: 2,
+      type: 'expense',
+      category: 'Others',
+      description: 'Gifted a mug',
+      amount: -530,
+      date: '27 Dec',
+      emoji: '☕',
+      color: '#6B7280'
+    },
+    {
+      id: 3,
+      type: 'income',
+      category: 'Income',
+      description: 'Sold files',
+      amount: 850,
+      date: '27 Dec',
+      emoji: '💰',
+      color: '#10B981'
+    },
+    {
+      id: 4,
+      type: 'income',
+      category: 'Income',
+      description: 'Got paid',
+      amount: 820,
+      date: '26 Dec',
+      emoji: '💵',
+      color: '#10B981'
+    },
+    {
+      id: 5,
+      type: 'expense',
+      category: 'Entertainment',
+      description: 'Got a toy',
+      amount: -250,
+      date: '25 Dec',
+      emoji: '🎁',
+      color: '#A855F7'
+    }
+  ]);
 
-const AddExpenses: React.FC<Props> = ({ navigation }) => {
-  const [currentInput, setCurrentInput] = useState<string>("");
-  const [total, setTotal] = useState<number>(0);
-  const [history, setHistory] = useState<HistoryItemProps[]>([]);
-  const [showHistory, setShowHistory] = useState<boolean>(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>("Food");
-  const [showCategoryDropdown, setShowCategoryDropdown] =
-    useState<boolean>(false);
-  const [description, setDescription] = useState<string>("");
-  const [screenHeight, setScreenHeight] = useState<number>(
-    Dimensions.get("window").height
-  );
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [newTransaction, setNewTransaction] = useState({
+    type: 'expense',
+    category: '',
+    description: '',
+    amount: ''
+  });
 
-  // Update dimensions on screen rotation or size change
-  useEffect(() => {
-    const updateLayout = (): void => {
-      setScreenHeight(Dimensions.get("window").height);
-    };
+  const totalBalance = transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+  const totalIncome = transactions
+    .filter(t => t.type === 'income')
+    .reduce((sum, transaction) => sum + transaction.amount, 0);
+  const totalExpense = Math.abs(transactions
+    .filter(t => t.type === 'expense')
+    .reduce((sum, transaction) => sum + transaction.amount, 0));
 
-    const dimensionsHandler: EmitterSubscription = Dimensions.addEventListener(
-      "change",
-      updateLayout
-    );
-
-    return () => {
-      // Clean up the event listener
-      dimensionsHandler?.remove();
-    };
-  }, []);
-
-  // Predefined categories
-  const categories: string[] = ["Food", "Transportation", "School", "Personal"];
-
-  const handleNumber = (num: string): void => {
-    setCurrentInput(currentInput + num);
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
   };
 
-  const handleSubmit = (): void => {
-    if (currentInput === "") return;
+  const handleDateChange = (event, date) => {
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+    if (date) {
+      setSelectedDate(date);
+    }
+  };
 
-    const value: number = parseFloat(currentInput);
-    if (!isNaN(value)) {
-      // Add the current value to history with the selected category and description
-      const newHistoryItem: HistoryItemProps = {
-        value: value,
-        category: selectedCategory,
-        description: description,
-        timestamp: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
+  const handleAddTransaction = () => {
+    if (newTransaction.category && newTransaction.description && newTransaction.amount) {
+      const amount = newTransaction.type === 'expense' 
+        ? -Math.abs(parseFloat(newTransaction.amount))
+        : Math.abs(parseFloat(newTransaction.amount));
+      
+      const emojis = {
+        'Dining': '🍕',
+        'Entertainment': '🎁',
+        'Shopping': '🛍️',
+        'Others': '📦',
+        'Income': '💰',
+        'Transport': '🚗',
+        'Health': '🏥'
       };
 
-      // Update the total and history
-      setTotal((prevTotal: number) => prevTotal + value);
-      setHistory((prevHistory: HistoryItemProps[]) => [
-        ...prevHistory,
-        newHistoryItem,
-      ]);
+      const colors = {
+        'Dining': '#8B5CF6',
+        'Entertainment': '#A855F7',
+        'Shopping': '#7C3AED',
+        'Others': '#6B7280',
+        'Income': '#10B981',
+        'Transport': '#8B5CF6',
+        'Health': '#A855F7'
+      };
 
-      // Clear the current input and description
-      setCurrentInput("");
-      setDescription("");
+      const newEntry = {
+        id: Date.now(),
+        type: newTransaction.type,
+        category: newTransaction.category,
+        description: newTransaction.description,
+        amount: amount,
+        date: formatDate(selectedDate),
+        emoji: emojis[newTransaction.category] || '📦',
+        color: colors[newTransaction.category] || '#6B7280'
+      };
+
+      setTransactions([newEntry, ...transactions]);
+      setNewTransaction({ type: 'expense', category: '', description: '', amount: '' });
+      setSelectedDate(new Date());
+      setShowAddForm(false);
+    } else {
+      Alert.alert('Error', 'Please fill in all fields');
     }
   };
 
-  const handleDecimal = (): void => {
-    if (!currentInput.includes(".")) {
-      setCurrentInput(currentInput === "" ? "0." : currentInput + ".");
-    }
-  };
+  const CategoryPicker = ({ value, onChange, type }) => {
+    const expenseCategories = ['Dining', 'Entertainment', 'Shopping', 'Transport', 'Health', 'Others'];
+    const incomeCategories = ['Income'];
+    const categories = type === 'expense' ? expenseCategories : incomeCategories;
 
-  const handleDelete = (): void => {
-    if (currentInput.length > 0) {
-      setCurrentInput(currentInput.slice(0, -1));
-    }
-  };
-
-  const handleClear = (): void => {
-    setCurrentInput("");
-  };
-
-  const handleClearAll = (): void => {
-    setCurrentInput("");
-    setDescription("");
-    setTotal(0);
-    setHistory([]);
-  };
-
-  const toggleHistory = (): void => {
-    setShowHistory(!showHistory);
-    setCurrentInput("");
-    setDescription("");
-  };
-
-  const toggleCategoryDropdown = (): void => {
-    setShowCategoryDropdown(!showCategoryDropdown);
-  };
-
-  const selectCategory = (category: string): void => {
-    setSelectedCategory(category);
-    setShowCategoryDropdown(false);
-  };
-
-  const formatCurrency = (value: number): string => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-    }).format(value);
+    return (
+      <View style={styles.categoryContainer}>
+        {categories.map((category) => (
+          <TouchableOpacity
+            key={category}
+            style={[
+              styles.categoryButton,
+              value === category && styles.categoryButtonSelected
+            ]}
+            onPress={() => onChange(category)}
+          >
+            <Text style={[
+              styles.categoryButtonText,
+              value === category && styles.categoryButtonTextSelected
+            ]}>
+              {category}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
   };
 
   return (
-    <>
-      <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
+    <Container>
+      <ScrollContainer>
+        {/* Header */}
+        <Header2>
+          <View>
+            <Greeting>Hello</Greeting>
+            <Username>Teenager</Username>
+          </View>
+          <TouchableOpacity style={styles.searchButton}
+          onPress={()=>navigation.navigate("ProfileTeen")}>
+            <Text style={styles.searchIcon}>🔍</Text>
+          </TouchableOpacity>
+        </Header2>
 
-      <Container>
-        <TotalView>
-          <TotalText>{formatCurrency(total)}</TotalText>
-        </TotalView>
+        {/* Balance Card */}
+        <BalanceCard>
+          <BalanceHeader>
+            <View>
+              <BalanceLabel>Total Balance</BalanceLabel>
+              <BalanceAmount>₱{totalBalance.toFixed(2)}</BalanceAmount>
+            </View>
+            <MoreIcon>⋯</MoreIcon>
+          </BalanceHeader>
+          
+          <IncomeExpenseRow>
+            <IncomeExpenseItem>
+              <View style={[styles.indicator, { backgroundColor: '#10B981' }]} />
+              <View>
+                <IncomeExpenseLabel>Income</IncomeExpenseLabel>
+                <Text style={[styles.incomeExpenseAmount, { color: '#10B981' }]}>
+                  ₱{totalIncome.toFixed(2)}
+                </Text>
+              </View>
+            </IncomeExpenseItem>
+            <IncomeExpenseLabel>
+              <View style={[styles.indicator, { backgroundColor: '#EF4444' }]} />
+              <View>
+                <IncomeExpenseLabel>Expense</IncomeExpenseLabel>
+                <Text style={[styles.incomeExpenseAmount, { color: '#EF4444' }]}>
+                  ₱{totalExpense.toFixed(2)}
+                </Text>
+              </View>
+            </IncomeExpenseLabel>
+          </IncomeExpenseRow>
+        </BalanceCard>
 
-        <InputView>
-          <InputText>
-            {currentInput
-              ? formatCurrency(parseFloat(currentInput) || 0)
-              : "$0.00"}
-          </InputText>
-        </InputView>
+        {/* Recent Transactions */}
+        <TransactionsSection>
+          <SectionTitle>Recent Transactions</SectionTitle>
+          
+          {transactions.map((transaction) => (
+            <View key={transaction.id} style={styles.transactionItem}>
+              <TransactionLeft>
+                <View style={[styles.iconContainer, { backgroundColor: transaction.color }]}>
+                  <Emoji>{transaction.emoji}</Emoji>
+                </View>
+                <TransactionDetails>
+                  <TransactionCategory>{transaction.category}</TransactionCategory>
+                  <TransactionDescription>{transaction.description}</TransactionDescription>
+                </TransactionDetails>
+              </TransactionLeft>
+              <TransactionRight>
+                <Text style={[
+                  styles.transactionAmount,
+                  { color: transaction.amount > 0 ? '#10B981' : '#EF4444' }
+                ]}>
+                  {transaction.amount > 0 ? '+' : ''}${Math.abs(transaction.amount)}
+                </Text>
+                <TransactionDate>{transaction.date}</TransactionDate>
+              </TransactionRight>
+            </View>
+          ))}
+        </TransactionsSection>
+      </ScrollContainer>
 
-        {/* Middle section */}
-        <CategoryContainer>
-          <CategoryLabel>Category:</CategoryLabel>
-          <DropdownButton onPress={toggleCategoryDropdown}>
-            <DropdownButtonText>{selectedCategory}</DropdownButtonText>
-            <DropdownIcon>▼</DropdownIcon>
-          </DropdownButton>
+      {/* Add Button */}
+      <TouchableOpacity 
+        style={styles.addButton}
+        onPress={() => setShowAddForm(true)}
+      >
+        <AddButtonText>+</AddButtonText>
+      </TouchableOpacity>
 
-          <Modal
-            transparent={true}
-            visible={showCategoryDropdown}
-            animationType="fade"
-            onRequestClose={() => setShowCategoryDropdown(false)}
-          >
-            <TouchableWithoutFeedback
-              onPress={() => setShowCategoryDropdown(false)}
-            >
-              <ModalOverlay>
-                <DropdownList>
-                  {categories.map((category: string) => (
-                    <DropdownItem
-                      key={category}
-                      selected={selectedCategory === category}
-                      onPress={() => selectCategory(category)}
-                    >
-                      <DropdownItemText
-                        selected={selectedCategory === category}
-                      >
-                        {category}
-                      </DropdownItemText>
-                    </DropdownItem>
-                  ))}
-                </DropdownList>
-              </ModalOverlay>
-            </TouchableWithoutFeedback>
-          </Modal>
-        </CategoryContainer>
+      {/* Add Transaction Modal */}
+      <Modal
+        visible={showAddForm}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowAddForm(false)}
+      >
+        <ModalOverlay>
+          <ModalContent>
+            <ModalTitle>Add Transaction</ModalTitle>
+            
+            <FormGroup>
+              <Label>Type</Label>
+              <View style={styles.typeSelector}>
+                <TouchableOpacity
+                  style={[
+                    styles.typeButton,
+                    newTransaction.type === 'expense' && styles.typeButtonSelected
+                  ]}
+                  onPress={() => setNewTransaction({...newTransaction, type: 'expense', category: ''})}
+                >
+                  <Text style={[
+                    styles.typeButtonText,
+                    newTransaction.type === 'expense' && styles.typeButtonTextSelected
+                  ]}>
+                    Expense
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.typeButton,
+                    newTransaction.type === 'income' && styles.typeButtonSelected
+                  ]}
+                  onPress={() => setNewTransaction({...newTransaction, type: 'income', category: ''})}
+                >
+                  <Text style={[
+                    styles.typeButtonText,
+                    newTransaction.type === 'income' && styles.typeButtonTextSelected
+                  ]}>
+                    Income
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </FormGroup>
+            
+            <FormGroup>
+              <Label>Category</Label>
+              <CategoryPicker
+                value={newTransaction.category}
+                onChange={(category) => setNewTransaction({...newTransaction, category})}
+                type={newTransaction.type}
+              />
+            </FormGroup>
+            
+            <FormGroup>
+              <Label>Description</Label>
+              <TextInput
+                style={styles.input}
+                value={newTransaction.description}
+                onChangeText={(text) => setNewTransaction({...newTransaction, description: text})}
+                placeholder="Enter description"
+                placeholderTextColor="#9CA3AF"
+              />
+            </FormGroup>
+            
+            <FormGroup>
+              <Label>Amount</Label>
+              <TextInput
+                style={styles.input}
+                value={newTransaction.amount}
+                onChangeText={(text) => setNewTransaction({...newTransaction, amount: text})}
+                placeholder="Enter amount"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="numeric"
+              />
+            </FormGroup>
 
-        <DescriptionContainer>
-          <DescriptionInput
-            placeholder="Enter description (optional)"
-            value={description}
-            onChangeText={setDescription}
-            placeholderTextColor="#adb5bd"
-          />
-        </DescriptionContainer>
-
-        <ActionsRow>
-          <HistoryToggle onPress={toggleHistory} activeOpacity={0.7}>
-            <HistoryToggleText>
-              {showHistory ? "Hide History" : "Show History"}
-            </HistoryToggleText>
-          </HistoryToggle>
-
-          <ClearAllToggle>
-            <ClearAllButton onPress={handleClearAll} activeOpacity={0.7}>
-              <ClearAllButtonText>Clear All</ClearAllButtonText>
-            </ClearAllButton>
-          </ClearAllToggle>
-        </ActionsRow>
-
-        {/* History Section - Conditionally Rendered */}
-        {showHistory && (
-          <HistoryContainer>
-            <HistoryTitle>History</HistoryTitle>
-            {history.length > 0 ? (
-              <HistoryList
-                showsVerticalScrollIndicator={true}
-                nestedScrollEnabled={true}
-                contentContainerStyle={{ paddingBottom: 5 }}
+            <FormGroup>
+              <Label>Date</Label>
+              <TouchableOpacity
+                style={styles.input}
+                onPress={() => setShowDatePicker(true)}
               >
-                {history.map((item: HistoryItemProps, index: number) => (
-                  <HistoryItem key={index}>
-                    <HistoryItemLeft>
-                      <HistoryTime>{item.timestamp}</HistoryTime>
-                      <HistoryItemCategory>{item.category}</HistoryItemCategory>
-                      {item.description ? (
-                        <HistoryItemDescription>
-                          {item.description}
-                        </HistoryItemDescription>
-                      ) : null}
-                    </HistoryItemLeft>
-                    <HistoryValue>{formatCurrency(item.value)}</HistoryValue>
-                  </HistoryItem>
-                ))}
-              </HistoryList>
-            ) : (
-              <EmptyHistoryText>No entries yet</EmptyHistoryText>
-            )}
-          </HistoryContainer>
-        )}
+                <Text style={styles.dateText}>
+                  {formatDate(selectedDate)}
+                </Text>
+              </TouchableOpacity>
+            </FormGroup>
+            
+            <View style={styles.buttonRow}>
+              <TouchableOpacity 
+                style={styles.cancelButton}
+                onPress={() => setShowAddForm(false)}
+              >
+                <CancelButtonText>Cancel</CancelButtonText>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.addTransactionButton}
+                onPress={handleAddTransaction}
+              >
+                <AddButtonText>Add</AddButtonText>
+              </TouchableOpacity>
+            </View>
+          </ModalContent>
+        </ModalOverlay>
+      </Modal>
 
-        {/* Flexible spacer to push keypad to bottom */}
-        <FlexSpacer />
+      {/* Date Picker */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={selectedDate}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={handleDateChange}
+          maximumDate={new Date()}
+        />
+      )}
 
-        {/* Number Pad - Now positioned at bottom */}
-        <KeypadContainer>
-          <KeypadRow>
-            <KeypadButton onPress={() => handleNumber("7")}>
-              <KeypadButtonText>7</KeypadButtonText>
-            </KeypadButton>
-            <KeypadButton onPress={() => handleNumber("8")}>
-              <KeypadButtonText>8</KeypadButtonText>
-            </KeypadButton>
-            <KeypadButton onPress={() => handleNumber("9")}>
-              <KeypadButtonText>9</KeypadButtonText>
-            </KeypadButton>
-          </KeypadRow>
-          <KeypadRow>
-            <KeypadButton onPress={() => handleNumber("4")}>
-              <KeypadButtonText>4</KeypadButtonText>
-            </KeypadButton>
-            <KeypadButton onPress={() => handleNumber("5")}>
-              <KeypadButtonText>5</KeypadButtonText>
-            </KeypadButton>
-            <KeypadButton onPress={() => handleNumber("6")}>
-              <KeypadButtonText>6</KeypadButtonText>
-            </KeypadButton>
-          </KeypadRow>
-          <KeypadRow>
-            <KeypadButton onPress={() => handleNumber("1")}>
-              <KeypadButtonText>1</KeypadButtonText>
-            </KeypadButton>
-            <KeypadButton onPress={() => handleNumber("2")}>
-              <KeypadButtonText>2</KeypadButtonText>
-            </KeypadButton>
-            <KeypadButton onPress={() => handleNumber("3")}>
-              <KeypadButtonText>3</KeypadButtonText>
-            </KeypadButton>
-          </KeypadRow>
-          <KeypadRow>
-            <KeypadButton onPress={handleDecimal}>
-              <KeypadButtonText>.</KeypadButtonText>
-            </KeypadButton>
-            <KeypadButton onPress={() => handleNumber("0")}>
-              <KeypadButtonText>0</KeypadButtonText>
-            </KeypadButton>
-            <KeypadButton isDelete={true} onPress={handleDelete}>
-              <KeypadButtonText isDelete={true}>⌫</KeypadButtonText>
-            </KeypadButton>
-          </KeypadRow>
-          <KeypadRow>
-            <KeypadButton isClear={true} onPress={handleClear}>
-              <KeypadButtonText>Clear</KeypadButtonText>
-            </KeypadButton>
-            <KeypadButton isAdd={true} onPress={handleSubmit}>
-              <KeypadButtonText isAdd={true}>Add</KeypadButtonText>
-            </KeypadButton>
-          </KeypadRow>
-        </KeypadContainer>
-      </Container>
-    </>
+      {/* iOS Date Picker Modal */}
+      {Platform.OS === 'ios' && showDatePicker && (
+        <Modal
+          transparent={true}
+          animationType="slide"
+          visible={showDatePicker}
+          onRequestClose={() => setShowDatePicker(false)}
+        >
+          <View style={styles.datePickerModalOverlay}>
+            <View style={styles.datePickerModal}>
+              <View style={styles.datePickerHeader}>
+                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                  <Text style={styles.datePickerCancel}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                  <Text style={styles.datePickerDone}>Done</Text>
+                </TouchableOpacity>
+              </View>
+              <DateTimePicker
+                value={selectedDate}
+                mode="date"
+                display="spinner"
+                onChange={handleDateChange}
+                maximumDate={new Date()}
+                style={styles.datePicker}
+              />
+            </View>
+          </View>
+        </Modal>
+      )}
+    </Container>
   );
 };
 
-export default AddExpenses;
+const styles = StyleSheet.create({
+  searchButton: {
+    width: 32,
+    height: 32,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  searchIcon: {
+    fontSize: 16,
+  },
+  indicator: {
+    width: 8,
+    height: 24,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  incomeExpenseLabel: {
+    color: '#6B7280',
+    fontSize: 12,
+    marginBottom: 2,
+  },
+  incomeExpenseAmount: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  transactionsSection: {
+    paddingHorizontal: 24,
+  },
+  transactionItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  transactionAmount: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  addButton: {
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    width: 56,
+    height: 56,
+    backgroundColor: '#8B5CF6',
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  typeSelector: {
+    flexDirection: 'row',
+    borderRadius: 8,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+  },
+  typeButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+  },
+  typeButtonSelected: {
+    backgroundColor: '#8B5CF6',
+  },
+  typeButtonText: {
+    color: '#374151',
+    fontWeight: '500',
+  },
+  typeButtonTextSelected: {
+    color: '#FFFFFF',
+  },
+  categoryContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  categoryButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    backgroundColor: '#FFFFFF',
+  },
+  categoryButtonSelected: {
+    backgroundColor: '#8B5CF6',
+    borderColor: '#8B5CF6',
+  },
+  categoryButtonText: {
+    fontSize: 14,
+    color: '#374151',
+  },
+  categoryButtonTextSelected: {
+    color: '#FFFFFF',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: '#000000',
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+  },
+  dateText: {
+    fontSize: 16,
+    color: '#000000',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  cancelButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  addTransactionButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#8B5CF6',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  datePickerModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  datePickerModal: {
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  datePickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  datePickerCancel: {
+    fontSize: 16,
+    color: '#6B7280',
+  },
+  datePickerDone: {
+    fontSize: 16,
+    color: '#8B5CF6',
+    fontWeight: '600',
+  },
+  datePicker: {
+    height: 200,
+  },
+});
+
+export default ExpenseTracker;

@@ -1,297 +1,348 @@
-import styled from "styled-components/native";
-import { Platform, StatusBar } from "react-native";
-import {
-  DropdownItemProps,
-  DropdownItemTextProps,
-  FlexSpacerProps,
-  KeypadButtonProps,
-  KeypadButtonTextProps,
-} from "../../../navigation/props";
-
-/* Add status bar height for iOS and Android */
-const STATUS_BAR_HEIGHT = Platform.OS === "ios" ? 50 : StatusBar.currentHeight;
+import styled from 'styled-components/native';
 
 export const Container = styled.SafeAreaView`
   flex: 1;
-  background-color: #f8f9fa;
-  justify-content: space-between; /* Always use space-between to position keypad at bottom */
-  padding-top: ${STATUS_BAR_HEIGHT}px; /* Add padding to account for status bar */
+  background-color: #ffffff;
 `;
 
-/* Total Display */
-export const TotalView = styled.View`
-  padding: 12px;
-  background-color: #212529;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  margin: 8px;
-  height: 70px;
-`;
-
-export const TotalText = styled.Text`
-  color: white;
-  font-size: 34px;
-  font-weight: 600;
-`;
-
-/* Input Display */
-export const InputView = styled.View`
-  padding: 8px;
-  background-color: #343a40;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  margin: 8px;
-  height: 45px;
-`;
-
-export const InputText = styled.Text`
-  color: white;
-  font-size: 20px;
-  font-weight: 400;
-`;
-
-/* Category Section */
-export const CategoryContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-  margin-horizontal: 10px;
-  margin-bottom: 10px;
-`;
-
-export const CategoryLabel = styled.Text`
-  font-size: 16px;
-  font-weight: 500;
-  margin-right: 10px;
-  color: #212529;
-`;
-
-export const DropdownButton = styled.TouchableOpacity`
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  background-color: white;
-  border-radius: 8px;
-  padding-horizontal: 15px;
-  padding-vertical: 8px;
-  border-width: 1px;
-  border-color: #ced4da;
+export const ScrollContainer = styled.ScrollView`
   flex: 1;
 `;
 
-export const DropdownButtonText = styled.Text`
-  font-size: 16px;
-  color: #212529;
+export const Header2 = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  padding-top: 32px;
 `;
 
-export const DropdownIcon = styled.Text`
+export const HeaderLeft = styled.View``;
+
+export const Greeting = styled.Text`
+  color: #6b7280;
+  font-size: 14px;
+`;
+
+export const UserName = styled.Text`
+  color: #000000;
+  font-size: 20px;
+  font-weight: 600;
+`;
+
+export const SearchButton = styled.TouchableOpacity`
+  width: 32px;
+  height: 32px;
+  background-color: #f3f4f6;
+  border-radius: 16px;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const SearchIcon = styled.Text`
+  font-size: 16px;
+`;
+
+export const BalanceCard = styled.View`
+  background-color: #f8fafc;
+  margin-horizontal: 24px;
+  margin-bottom: 24px;
+  border-radius: 12px;
+  padding: 24px;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.1;
+  shadow-radius: 8px;
+  elevation: 4;
+`;
+
+export const BalanceHeader = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+`;
+
+export const BalanceLeft = styled.View``;
+
+export const BalanceLabel = styled.Text`
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 4px;
+`;
+
+export const BalanceAmount = styled.Text`
+  color: #000000;
+  font-size: 32px;
+  font-weight: bold;
+`;
+
+export const MoreIcon = styled.Text`
+  color: #9ca3af;
+  font-size: 20px;
+`;
+
+export const IncomeExpenseRow = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
+export const IncomeExpenseItem = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+interface IndicatorProps {
+  color: string;
+}
+
+export const Indicator = styled.View<IndicatorProps>`
+  width: 8px;
+  height: 24px;
+  border-radius: 4px;
+  margin-right: 8px;
+  background-color: ${props => props.color};
+`;
+
+export const IncomeExpenseDetails = styled.View``;
+
+export const IncomeExpenseLabel = styled.Text`
+  color: #6b7280;
   font-size: 12px;
-  color: #6c757d;
+  margin-bottom: 2px;
+`;
+
+interface AmountTextProps {
+  color: string;
+}
+
+export const IncomeExpenseAmount = styled.Text<AmountTextProps>`
+  font-size: 16px;
+  font-weight: 600;
+  color: ${props => props.color};
+`;
+
+export const TransactionsSection = styled.View`
+  padding-horizontal: 24px;
+`;
+
+export const SectionTitle = styled.Text`
+  color: #000000;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+`;
+
+export const TransactionItem = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+`;
+
+export const TransactionLeft = styled.View`
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+`;
+
+interface IconContainerProps {
+  backgroundColor: string;
+}
+
+export const IconContainer = styled.View<IconContainerProps>`
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  background-color: ${props => props.backgroundColor};
+`;
+
+export const Emoji = styled.Text`
+  font-size: 20px;
+`;
+
+export const TransactionDetails = styled.View`
+  flex: 1;
+`;
+
+export const TransactionCategory = styled.Text`
+  color: #000000;
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 2px;
+`;
+
+export const TransactionDescription = styled.Text`
+  color: #9ca3af;
+  font-size: 14px;
+`;
+
+export const TransactionRight = styled.View`
+  align-items: flex-end;
+`;
+
+export const TransactionAmount = styled.Text<AmountTextProps>`
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  color: ${props => props.color};
+`;
+
+export const TransactionDate = styled.Text`
+  color: #9ca3af;
+  font-size: 14px;
+`;
+
+export const AddButton = styled.TouchableOpacity`
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  background-color: #8b5cf6;
+  border-radius: 28px;
+  align-items: center;
+  justify-content: center;
+  elevation: 8;
+  shadow-color: #000;
+  shadow-offset: 0px 4px;
+  shadow-opacity: 0.3;
+  shadow-radius: 8px;
+`;
+
+export const AddButtonText = styled.Text`
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: bold;
 `;
 
 export const ModalOverlay = styled.View`
   flex: 1;
   background-color: rgba(0, 0, 0, 0.5);
-`;
-
-export const DropdownList = styled.View`
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  top: 190px;
-  background-color: white;
-  border-radius: 8px;
-  border-width: 1px;
-  border-color: #ced4da;
-  shadow-color: #000;
-  shadow-offset: 0px 2px;
-  shadow-opacity: 0.25;
-  shadow-radius: 3.84px;
-  elevation: 5;
-  z-index: 1000;
-`;
-
-export const DropdownItem = styled.TouchableOpacity<DropdownItemProps>`
-  padding-vertical: 12px;
-  padding-horizontal: 15px;
-  border-bottom-width: 1px;
-  border-bottom-color: #e9ecef;
-  background-color: ${(props) =>
-    props.selected ? "rgba(138, 43, 226, 0.1)" : "white"};
-`;
-
-export const DropdownItemText = styled.Text<DropdownItemTextProps>`
-  font-size: 16px;
-  color: ${(props) => (props.selected ? "#8a2be2" : "#212529")};
-  font-weight: ${(props) => (props.selected ? "500" : "normal")};
-`;
-
-/* Description Section */
-export const DescriptionContainer = styled.View`
-  margin-horizontal: 10px;
-  margin-bottom: 10px;
-`;
-
-export const DescriptionInput = styled.TextInput`
-  background-color: white;
-  border-radius: 8px;
-  padding-horizontal: 15px;
-  padding-vertical: 10px;
-  border-width: 1px;
-  border-color: #ced4da;
-  font-size: 16px;
-  color: #212529;
-`;
-
-/* Actions Row */
-export const ActionsRow = styled.View`
-  flex-direction: row;
-  margin-horizontal: 10px;
-  margin-bottom: 10px;
-`;
-
-export const HistoryToggle = styled.TouchableOpacity`
-  background-color: #8a2be2;
-  padding: 10px;
-  border-radius: 8px;
-  align-items: center;
-  flex: 1;
-  margin-right: 5px;
-`;
-
-export const HistoryToggleText = styled.Text`
-  color: white;
-  font-weight: 500;
-  font-size: 14px;
-`;
-
-export const ClearAllToggle = styled.View`
-  flex: 1;
-`;
-
-export const ClearAllButton = styled.TouchableOpacity`
-  background-color: #e9ecef;
-  padding: 10px;
-  border-radius: 8px;
-  align-items: center;
-  flex: 1;
-`;
-
-export const ClearAllButtonText = styled.Text`
-  color: #dc3545;
-  font-weight: 500;
-  font-size: 14px;
-`;
-
-/* History Section */
-export const HistoryContainer = styled.View`
-  background-color: white;
-  border-radius: 12px;
-  margin: 10px;
-  padding: 10px;
-  max-height: 150px;
-`;
-
-export const HistoryTitle = styled.Text`
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 5px;
-  color: #212529;
-`;
-
-export const HistoryList = styled.ScrollView`
-  flex-grow: 0;
-  flex-shrink: 1;
-`;
-
-export const HistoryItem = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding-vertical: 5px;
-  border-bottom-width: 1px;
-  border-bottom-color: #e9ecef;
-`;
-
-export const HistoryItemLeft = styled.View`
-  flex: 1;
-  margin-right: 5px;
-`;
-
-export const HistoryTime = styled.Text`
-  color: #6c757d;
-  font-size: 11px;
-`;
-
-export const HistoryItemCategory = styled.Text`
-  color: #343a40;
-  font-size: 13px;
-  font-weight: 400;
-`;
-
-export const HistoryItemDescription = styled.Text`
-  color: #6c757d;
-  font-size: 11px;
-  font-style: italic;
-  margin-top: 1px;
-`;
-
-export const HistoryValue = styled.Text`
-  color: #212529;
-  font-size: 13px;
-  font-weight: 500;
-`;
-
-export const EmptyHistoryText = styled.Text`
-  color: #6c757d;
-  text-align: center;
-  margin-top: 20px;
-  font-size: 14px;
-`;
-
-/* Flex spacer to push keypad to bottom when needed */
-export const FlexSpacer = styled.View<FlexSpacerProps>`
-  flex: ${(props) => props.size || 1};
-`;
-
-/* Keypad */
-export const KeypadContainer = styled.View`
-  padding: 4px;
-  margin-bottom: ${Platform.OS === "ios"
-    ? 20
-    : 45}px; /* Add bottom margin to avoid edge */
-`;
-
-export const KeypadRow = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  margin-bottom: 6px;
-`;
-
-export const KeypadButton = styled.TouchableOpacity<KeypadButtonProps>`
-  background-color: ${(props) =>
-    props.isAdd
-      ? "#8a2be2"
-      : props.isClear || props.isDelete
-      ? "#e9ecef"
-      : "white"};
-  flex: 1;
-  height: 50px;
-  border-radius: 25px;
   justify-content: center;
   align-items: center;
-  margin: 3px;
-  shadow-color: #000;
-  shadow-offset: 0px 1px;
-  shadow-opacity: 0.1;
-  shadow-radius: 2px;
-  elevation: 2;
+  padding: 16px;
 `;
 
-export const KeypadButtonText = styled.Text<KeypadButtonTextProps>`
-  font-size: ${(props) => (props.isAdd ? "17px" : "20px")};
-  font-weight: ${(props) => (props.isAdd ? "600" : "500")};
-  color: ${(props) =>
-    props.isAdd ? "white" : props.isDelete ? "#dc3545" : "#212529"};
+export const ModalContent = styled.View`
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  max-width: 400px;
+`;
+
+export const ModalTitle = styled.Text`
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #000000;
+`;
+
+export const FormGroup = styled.View`
+  margin-bottom: 16px;
+`;
+
+export const Label = styled.Text`
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #000000;
+`;
+
+export const TypeSelector = styled.View`
+  flex-direction: row;
+  border-radius: 8px;
+  overflow: hidden;
+  border-width: 1px;
+  border-color: #d1d5db;
+`;
+
+interface TypeButtonProps {
+  selected: boolean;
+}
+
+export const TypeButton = styled.TouchableOpacity<TypeButtonProps>`
+  flex: 1;
+  padding-vertical: 12px;
+  padding-horizontal: 16px;
+  background-color: ${props => props.selected ? '#8b5cf6' : '#ffffff'};
+  align-items: center;
+`;
+
+export const TypeButtonText = styled.Text<TypeButtonProps>`
+  color: ${props => props.selected ? '#ffffff' : '#374151'};
+  font-weight: 500;
+`;
+
+export const CategoryContainer = styled.View`
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+`;
+
+interface CategoryButtonProps {
+  selected: boolean;
+}
+
+export const CategoryButton = styled.TouchableOpacity<CategoryButtonProps>`
+  padding-vertical: 8px;
+  padding-horizontal: 12px;
+  border-radius: 20px;
+  border-width: 1px;
+  border-color: ${props => props.selected ? '#8b5cf6' : '#d1d5db'};
+  background-color: ${props => props.selected ? '#8b5cf6' : '#ffffff'};
+`;
+
+export const CategoryButtonText = styled.Text<CategoryButtonProps>`
+  font-size: 14px;
+  color: ${props => props.selected ? '#ffffff' : '#374151'};
+`;
+
+export const Input = styled.TextInput`
+  border-width: 1px;
+  border-color: #d1d5db;
+  border-radius: 8px;
+  padding-vertical: 12px;
+  padding-horizontal: 16px;
+  font-size: 16px;
+  color: #000000;
+  background-color: #ffffff;
+`;
+
+export const ModalButtons = styled.View`
+  flex-direction: row;
+  gap: 12px;
+  margin-top: 8px;
+`;
+
+export const CancelButton = styled.TouchableOpacity`
+  flex: 1;
+  padding-vertical: 12px;
+  padding-horizontal: 16px;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  align-items: center;
+`;
+
+export const CancelButtonText = styled.Text`
+  color: #374151;
+  font-weight: 500;
+`;
+
+export const AddTransactionButton = styled.TouchableOpacity`
+  flex: 1;
+  padding-vertical: 12px;
+  padding-horizontal: 16px;
+  background-color: #8b5cf6;
+  border-radius: 8px;
+  align-items: center;
+`;
+
+export const AddTransactionButtonText = styled.Text`
+  color: #ffffff;
+  font-weight: 500;
 `;
