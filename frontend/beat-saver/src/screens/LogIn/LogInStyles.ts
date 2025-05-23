@@ -68,7 +68,7 @@ export const BtnContainer = styled(View)`
 `;
 
 export const Btn = styled(TouchableOpacity)`
-  background-color: #3662aa;
+  background-color: #8a2be2;
   padding: 14px;
   border-radius: 10px;
   margin-top: 20px;

@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { Props, UserProps } from "../../../../navigation/props";
 import {
   Container,
@@ -11,10 +11,17 @@ import {
   UserProfileText,
 } from "./UserItemStyles";
 
-const UserItem = ({ navigation, user }: Props & UserProps) => {
+const UserItem = ({ navigation, user, parentId }: Props & UserProps) => {
+  useEffect(() => {
+    console.log(user);
+    console.log(parentId);
+  }, []);
+
   return (
     <Container
-      onPress={() => navigation.navigate("ParentInfo", { user: user })}
+      onPress={() =>
+        navigation.navigate("ParentInfo", { user: user, parentId: parentId })
+      }
     >
       {/* <UserImage /> */}
       <UserProfile>
