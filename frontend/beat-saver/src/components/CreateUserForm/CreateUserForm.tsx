@@ -5,10 +5,11 @@ import {
   Alert,
   TouchableWithoutFeedback,
   Keyboard,
+  Modal,
 } from "react-native";
-import { Formik } from "formik";
+import { Formik, FormikHelpers, FormikProps, FormikValues } from "formik";
 import * as yup from "yup";
-import { CreateUserFormProps, Props } from "../../navigation/props";
+import { CreateUserFormProps, Props, UserForm } from "../../navigation/props";
 import {
   Btn,
   BtnContainer,
@@ -25,9 +26,15 @@ import {
   PasswordVisibleBtn,
 } from "./CreateUserFormStyles";
 import Feather from "@expo/vector-icons/Feather";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import { AUTH, DB } from "../../db/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+} from "firebase/auth";
 import {
   addDoc,
   collection,
@@ -40,26 +47,76 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({
   navigation,
   addParentUser,
   addTeenUser,
+  parentUid,
 }) => {
   const [userId, setUserId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [visiblePassword, setVisiblePassword] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [currentUserPassword, setCurrentUserPassword] = useState("");
+  const [pendingUserData, setPendingUserData] = useState<
+    UserForm | FormikHelpers<UserForm> | null | Object
+  >();
   const auth = AUTH;
 
-  const handleRegister = async (email: string, password: string) => {
+  const handleRegister = async (
+    email: string,
+    password: string,
+    firstName: string,
+    lastName: string,
+    currentPassword: string
+  ) => {
     setIsLoading(true);
+
+    const currentUser = auth.currentUser;
+    const currentUserEmail = currentUser?.email;
+
+    if (!currentUser || !currentUserEmail) {
+      setIsLoading(false);
+      Alert.alert("Error", "No current user found");
+      return null;
+    }
+
     try {
+      // FIRST: Validate the parent's password by re-authenticating them
+      // This doesn't change the current session, just verifies the password
+      const { EmailAuthProvider, reauthenticateWithCredential } = await import(
+        "firebase/auth"
+      );
+
+      const credential = EmailAuthProvider.credential(
+        currentUserEmail,
+        currentPassword
+      );
+      await reauthenticateWithCredential(currentUser, credential);
+
+      console.log("verified");
+
       const response = await createUserWithEmailAndPassword(
         auth,
         email,
         password
       );
 
-      const uid = response.user.uid;
-      Alert.alert("User Created");
-      return uid;
+      const newUserUid = response.user.uid;
+
+      await signOut(auth);
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      await signInWithEmailAndPassword(auth, currentUserEmail, currentPassword);
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      Alert.alert("Success", "User created successfully!");
+      return newUserUid;
     } catch (error) {
-      console.error(error);
+      console.log("Error in user creation process:", error);
+
+      let errorMessage = "Incorrect password";
+
+      Alert.alert("Error", errorMessage);
+      return null;
     } finally {
       setIsLoading(false);
     }
@@ -73,16 +130,79 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({
     password: yup
       .string()
       .required("Please enter a password")
-      .min(7, "Please enter a mininum of 7 characters"),
-    firstName: yup.string().required("Please your a first name"),
+      .min(7, "Please enter a minimum of 7 characters"),
+    firstName: yup.string().required("Please enter a first name"),
     lastName: yup.string().required("Please enter a last name"),
   });
+
+  const handleSubmitWithPasswordCheck = async (
+    values: UserForm,
+    actions: FormikHelpers<UserForm>
+  ) => {
+    setPendingUserData({ values, actions });
+
+    setShowPasswordModal(true);
+  };
+
+  const confirmCreateUser = async () => {
+    if (!pendingUserData || !currentUserPassword) {
+      Alert.alert("Error", "Please enter your password");
+      return;
+    }
+
+    const { values, actions }: any = pendingUserData;
+
+    setShowPasswordModal(false);
+
+    const uid = await handleRegister(
+      values.email,
+      values.password,
+      values.firstName,
+      values.lastName,
+      currentUserPassword
+    );
+
+    if (!uid) {
+      // Reset password field on error
+      setCurrentUserPassword("");
+      return;
+    }
+    if (addParentUser) {
+      await addParentUser(values.email, values.firstName, values.lastName, uid);
+    }
+
+    if (addTeenUser && parentUid) {
+      await addTeenUser(
+        values.email,
+        values.firstName,
+        values.lastName,
+        uid,
+        parentUid
+      );
+    }
+
+    actions.resetForm();
+    setCurrentUserPassword("");
+    setPendingUserData(null);
+
+    // Navigate back to parent home screen after successful creation
+    if (navigation && addTeenUser) {
+      // Navigate back to the parent's home screen
+      navigation.navigate("HomeParent");
+    }
+  };
+
+  const cancelCreateUser = () => {
+    setShowPasswordModal(false);
+    setCurrentUserPassword("");
+    setPendingUserData(null);
+  };
 
   if (isLoading) {
     return (
       <LoadingContainer>
         <Loading />
-        <Text>Loading...</Text>
+        <Text>Creating user...</Text>
       </LoadingContainer>
     );
   }
@@ -97,32 +217,11 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({
           lastName: "",
         }}
         validationSchema={FormsSchema}
-        onSubmit={async (values, actions) => {
-          const uid = await handleRegister(values.email, values.password);
-
-          if (!uid) {
-            return;
-          }
-
-          if (addParentUser)
-            await addParentUser(
-              values.email,
-              values.firstName,
-              values.lastName,
-              uid
-            );
-          if (addTeenUser)
-            await addTeenUser(
-              values.email,
-              values.firstName,
-              values.lastName,
-              uid
-            );
-
-          actions.resetForm();
-        }}
+        onSubmit={(values: UserForm, actions: FormikHelpers<UserForm>) =>
+          handleSubmitWithPasswordCheck(values, actions)
+        }
       >
-        {(props) => (
+        {(props: FormikProps<UserForm>) => (
           <>
             <InputContainer>
               <InputText
@@ -178,6 +277,82 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({
           </>
         )}
       </Formik>
+
+      {/* Password Confirmation Modal */}
+      <Modal
+        visible={showPasswordModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={cancelCreateUser}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              padding: 20,
+              borderRadius: 10,
+              width: "80%",
+              maxWidth: 400,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: "bold",
+                marginBottom: 10,
+                textAlign: "center",
+              }}
+            >
+              Confirm Your Password
+            </Text>
+            <Text
+              style={{
+                marginBottom: 20,
+                textAlign: "center",
+                color: "#666",
+              }}
+            >
+              Please enter your current password to create the new user
+            </Text>
+
+            <InputContainer>
+              <InputText
+                placeholder="Your Current Password"
+                value={currentUserPassword}
+                onChangeText={setCurrentUserPassword}
+                secureTextEntry={true}
+                autoFocus={true}
+              />
+            </InputContainer>
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                marginTop: 20,
+              }}
+            >
+              <Btn
+                onPress={cancelCreateUser}
+                style={{ backgroundColor: "#ccc", flex: 0.45 }}
+              >
+                <BtnText style={{ color: "#333" }}>Cancel</BtnText>
+              </Btn>
+
+              <Btn onPress={confirmCreateUser} style={{ flex: 0.45 }}>
+                <BtnText>Confirm</BtnText>
+              </Btn>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </>
   );
 };

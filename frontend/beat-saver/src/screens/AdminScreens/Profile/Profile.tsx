@@ -1,8 +1,27 @@
-import { View, Text, Button } from "react-native";
+import { View, Text, Button, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { Props } from "../../../navigation/props";
 import { AUTH } from "../../../db/firebase";
 import { getAuth, onAuthStateChanged, signOut, User } from "@firebase/auth";
+import {
+  Avatar,
+  AvatarContainer,
+  AvatarTxt,
+  BackIcon,
+  Container,
+  ForwardArrow,
+  Header,
+  LogOut,
+  LogOutContainer,
+  LogOutIcon,
+  LogOutTxt,
+  Name,
+  NameContainer,
+  OptionsContainer,
+  Title,
+  TitleContainer,
+  UserInfo,
+} from "./ProfileAdminStyles";
 
 const Profile: React.FC<Props> = ({ navigation }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -27,12 +46,36 @@ const Profile: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <View>
-      <Text>{user?.uid}</Text>
-      <Text>{user?.email}</Text>
+    <Container>
+      <Header>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <BackIcon name="arrow-back" size={26} />
+        </TouchableOpacity>
+        <TitleContainer style={{ flex: 1, alignItems: "center" }}>
+          <Title>Profile</Title>
+        </TitleContainer>
+      </Header>
 
-      <Button title="Sign Out" onPress={signOutUser} />
-    </View>
+      <UserInfo></UserInfo>
+      <AvatarContainer>
+        <Avatar>
+          <AvatarTxt>A</AvatarTxt>
+        </Avatar>
+      </AvatarContainer>
+
+      <NameContainer>
+        <Name>Admin</Name>
+      </NameContainer>
+      <OptionsContainer onPress={signOutUser}>
+        <LogOutContainer>
+          <LogOut>
+            <LogOutIcon name="log-out" size={30} color="white" />
+          </LogOut>
+          <LogOutTxt>Logout</LogOutTxt>
+        </LogOutContainer>
+        <ForwardArrow name="arrow-forward-ios" size={26} />
+      </OptionsContainer>
+    </Container>
   );
 };
 

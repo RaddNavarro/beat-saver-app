@@ -155,10 +155,6 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
               )}
             </Formik>
             <Button
-              title="Create Teen Account"
-              onPress={() => navigation.navigate("CreateTeens")}
-            />
-            <Button
               title="Create Parent Account"
               onPress={() => navigation.navigate("CreateParents")}
             />
