@@ -16,6 +16,7 @@ import Dashboard from "../screens/AdminScreens/Dashboard/Dashboard";
 import HomeTeen from "../screens/TeenScreens/Home/Home";
 import HomeParent from "../screens/ParentScreens/Home/Home";
 import ParentInfo from "../screens/AdminScreens/ParentInfo/ParentInfo";
+import ExpenseTracker from "../screens/TeenScreens/AddExpenses/AddExpenses";
 
 // Define user roles
 type UserRole = "parent" | "teen" | "admin" | null;
@@ -28,10 +29,10 @@ function NestedLayoutTeen() {
     <NestedStack.Navigator>
       <NestedStack.Screen
         name="HomeTeen"
-        component={HomeTeen}
+        component={ExpenseTracker}
         options={{ headerShown: false }}
       />
-      <NestedStack.Screen name="ProfileTeen" component={ProfileTeen} />
+      <NestedStack.Screen name="ProfileTeen" component={ProfileTeen} options={{ headerShown: false }}/>
     </NestedStack.Navigator>
   );
 }
