@@ -33,6 +33,7 @@ export interface CreateUserFormProps extends Props {
 
 export interface UserProps {
   user: any;
+  parentId: string;
 }
 
 export interface UserForm {
