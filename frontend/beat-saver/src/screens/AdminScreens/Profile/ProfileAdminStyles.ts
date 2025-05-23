@@ -3,6 +3,7 @@ import styled from "styled-components";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 export const Header = styled(View)`
   margin-top: 43px;
@@ -73,7 +74,7 @@ export const LogOutContainer = styled(View)`
 `;
 
 export const LogOut = styled(View)`
-  background-color: #8a2be2;
+  background-color: #000000;
   border-radius: 50px;
 `;
 
@@ -86,12 +87,34 @@ export const LogOutTxt = styled(Text)`
   margin-left: 10px;
 `;
 
-export const OptionsContainer = styled(TouchableOpacity)`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+export const OptionsContainer = styled(View)`
   margin-top: 20px;
   padding: 20px;
 `;
 
+export const OptionsItem = styled(TouchableOpacity)`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+`;
+
 export const ForwardArrow = styled(MaterialIcons)``;
+
+export const AddUserContainer = styled(View)`
+  flex-direction: row;
+  align-items: center;
+`;
+
+export const AddUser = styled(View)`
+  background-color: #8a2be2;
+  border-radius: 50px;
+`;
+
+export const AddUserTxt = styled(Text)`
+  font-size: 16px;
+  margin-left: 10px;
+`;
+export const AddUserIcon = styled(AntDesign)`
+  padding: 10px;
+`;

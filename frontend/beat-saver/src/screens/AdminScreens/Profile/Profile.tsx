@@ -4,6 +4,10 @@ import { Props } from "../../../navigation/props";
 import { AUTH } from "../../../db/firebase";
 import { getAuth, onAuthStateChanged, signOut, User } from "@firebase/auth";
 import {
+  AddUser,
+  AddUserContainer,
+  AddUserIcon,
+  AddUserTxt,
   Avatar,
   AvatarContainer,
   AvatarTxt,
@@ -18,6 +22,7 @@ import {
   Name,
   NameContainer,
   OptionsContainer,
+  OptionsItem,
   Title,
   TitleContainer,
   UserInfo,
@@ -66,14 +71,27 @@ const Profile: React.FC<Props> = ({ navigation }) => {
       <NameContainer>
         <Name>Admin</Name>
       </NameContainer>
-      <OptionsContainer onPress={signOutUser}>
-        <LogOutContainer>
-          <LogOut>
-            <LogOutIcon name="log-out" size={30} color="white" />
-          </LogOut>
-          <LogOutTxt>Logout</LogOutTxt>
-        </LogOutContainer>
-        <ForwardArrow name="arrow-forward-ios" size={26} />
+      <OptionsContainer>
+        <OptionsItem onPress={() => navigation.navigate("CreateParents")}>
+          <AddUserContainer>
+            <AddUser>
+              <AddUserIcon name="adduser" size={30} color="white" />
+            </AddUser>
+            <AddUserTxt>Add Parent User</AddUserTxt>
+          </AddUserContainer>
+
+          <ForwardArrow name="arrow-forward-ios" size={26} />
+        </OptionsItem>
+        <OptionsItem onPress={signOutUser}>
+          <LogOutContainer>
+            <LogOut>
+              <LogOutIcon name="log-out" size={30} color="white" />
+            </LogOut>
+            <LogOutTxt>Logout</LogOutTxt>
+          </LogOutContainer>
+
+          <ForwardArrow name="arrow-forward-ios" size={26} />
+        </OptionsItem>
       </OptionsContainer>
     </Container>
   );
