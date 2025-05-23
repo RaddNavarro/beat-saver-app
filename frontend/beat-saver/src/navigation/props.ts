@@ -1,4 +1,4 @@
-import { NavigationProp } from "@react-navigation/native";
+import { NavigationProp, Route, RouteProp } from "@react-navigation/native";
 
 export interface Props {
   navigation: NavigationProp<any>;
@@ -10,7 +10,8 @@ export interface Parent {
     email: string,
     firstName: string,
     lastName: string,
-    currentUserId: string
+    currentUserId: string,
+    teens?: string
   ): Promise<void>;
 }
 
@@ -19,15 +20,61 @@ export interface Teen {
     email: string,
     firstName: string,
     lastName: string,
-    currentUserId: string
+    currentUserId: string,
+    parentUid: string
   ): Promise<void>;
 }
 
 export interface CreateUserFormProps extends Props {
   addParentUser?: Parent;
   addTeenUser?: Teen;
+  parentUid?: string;
 }
 
 export interface UserProps {
   user: any;
+}
+
+export interface UserForm {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface ExpenseItemProps {
+  icon: string;
+  title: string;
+  subtitle: string;
+  amount: string;
+}
+
+export interface HistoryItemProps {
+  value: number;
+  category: string;
+  description: string;
+  timestamp: string;
+}
+
+export interface DropdownItemProps {
+  selected?: boolean;
+}
+
+export interface DropdownItemTextProps {
+  selected?: boolean;
+}
+
+export interface KeypadButtonProps {
+  isAdd?: boolean;
+  isClear?: boolean;
+  isDelete?: boolean;
+}
+
+export interface KeypadButtonTextProps {
+  isAdd?: boolean;
+  isDelete?: boolean;
+}
+
+export interface FlexSpacerProps {
+  size?: number;
 }

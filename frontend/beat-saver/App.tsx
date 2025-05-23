@@ -4,6 +4,7 @@ import AppNavigator from "./src/navigation/AppNavigator";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AddExpenses from "./src/screens/TeenScreens/AddExpenses/AddExpenses";
 import Dashboard from "./src/screens/AdminScreens/Dashboard/Dashboard";
+import Home from "./src/screens/TeenScreens/Home/Home";
 
 export default function App() {
   return <AppNavigator />;

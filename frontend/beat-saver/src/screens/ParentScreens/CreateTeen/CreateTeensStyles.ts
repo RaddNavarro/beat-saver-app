@@ -23,7 +23,7 @@ export const KeyboardContainer = styled(KeyboardAvoidingView)`
 
 export const SafeArea = styled(SafeAreaView)`
   flex: 1;
-  background-color: #ffffff;
+  background-color: #f5f5f5;
 `;
 
 export const CreateTeensText = styled(Text)`
@@ -74,9 +74,9 @@ export const BtnText = styled(Text)`
 `;
 
 export const LoadingContainer = styled(SafeAreaView)`
-  flex: 1;
+  position: absolute;
   background-color: #f5f5f5;
-  padding-top: ${StatusBar.currentHeight};
+  padding-top: ${StatusBar.currentHeight}px;
   justify-content: center;
   align-items: center;
 `;

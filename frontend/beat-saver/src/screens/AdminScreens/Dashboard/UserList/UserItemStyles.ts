@@ -1,10 +1,9 @@
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import styled from "styled-components";
 
-export const Container = styled(View)`
+export const Container = styled(TouchableOpacity)`
   flex-direction: row;
   align-items: center;
-  padding-horizontal: 20px;
 `;
 
 // if the parents is gonna have an image
@@ -17,7 +16,7 @@ export const UserImage = styled(Image)`
   maregin-left: 10px;
 `;
 
-export const UserProfile = styled(TouchableOpacity)`
+export const UserProfile = styled(View)`
   width: 90px;
   height: 90px;
   border-radius: 45px;

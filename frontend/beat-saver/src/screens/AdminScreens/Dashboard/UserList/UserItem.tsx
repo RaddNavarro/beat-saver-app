@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity } from "react-native";
 import React from "react";
-import { UserProps } from "../../../../navigation/props";
+import { Props, UserProps } from "../../../../navigation/props";
 import {
   Container,
   UserEmail,
@@ -11,9 +11,11 @@ import {
   UserProfileText,
 } from "./UserItemStyles";
 
-const UserItem = ({ user }: UserProps) => {
+const UserItem = ({ navigation, user }: Props & UserProps) => {
   return (
-    <Container>
+    <Container
+      onPress={() => navigation.navigate("ParentInfo", { user: user })}
+    >
       {/* <UserImage /> */}
       <UserProfile>
         <UserProfileText>

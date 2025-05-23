@@ -13,7 +13,7 @@ import {
   Btn,
   BtnContainer,
   BtnText,
-  Container,
+  Content,
   ErrorText,
   InputContainer,
   InputText,
@@ -21,11 +21,11 @@ import {
   Loading,
   LoadingContainer,
   CreateParentsText,
+  SafeArea,
 } from "./CreateParentsStyles";
 import { useState } from "react";
 import { AUTH, DB } from "../../../db/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import CreateUserForm from "../../../components/CreateUserForm/CreateUserForm";
 import firebase from "firebase/compat/app";
 import {
   addDoc,
@@ -34,6 +34,7 @@ import {
   getFirestore,
   setDoc,
 } from "firebase/firestore";
+import CreateUserForm from "../../../components/CreateUserForm/CreateUserForm";
 
 const CreateParents: React.FC<Props> = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -72,13 +73,19 @@ const CreateParents: React.FC<Props> = ({ navigation }) => {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardContainer behavior="padding">
-        <CreateParentsText>Create Parent</CreateParentsText>
-        <CreateUserForm navigation={navigation} addParentUser={addParentUser} />
-        <Button title="Log In" onPress={() => navigation.navigate("LogIn")} />
-      </KeyboardContainer>
-    </TouchableWithoutFeedback>
+    <SafeArea>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardContainer behavior="padding">
+          <Content>
+            <CreateParentsText>Create Parent</CreateParentsText>
+            <CreateUserForm
+              navigation={navigation}
+              addParentUser={addParentUser}
+            />
+          </Content>
+        </KeyboardContainer>
+      </TouchableWithoutFeedback>
+    </SafeArea>
   );
 };
 

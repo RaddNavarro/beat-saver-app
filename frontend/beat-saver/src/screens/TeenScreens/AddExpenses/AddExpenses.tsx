@@ -1,43 +1,97 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  SafeAreaView,
-  StatusBar,
-  ScrollView,
   Modal,
   TouchableWithoutFeedback,
-  TextInput,
+  Dimensions,
+  StatusBar,
+  EmitterSubscription,
 } from "react-native";
 
-const AddExpenses = () => {
-  const [currentInput, setCurrentInput] = useState("");
-  const [total, setTotal] = useState(0);
-  const [history, setHistory] = useState([]);
-  const [showHistory, setShowHistory] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("Food");
-export default function NumPadAdder() {
-  const [currentInput, setCurrentInput] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('Food');
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-  const [description, setDescription] = useState("");
+import {
+  ActionsRow,
+  CategoryContainer,
+  CategoryLabel,
+  ClearAllButton,
+  ClearAllButtonText,
+  ClearAllToggle,
+  Container,
+  DescriptionContainer,
+  DescriptionInput,
+  DropdownButton,
+  DropdownButtonText,
+  DropdownIcon,
+  DropdownItem,
+  DropdownItemText,
+  DropdownList,
+  EmptyHistoryText,
+  FlexSpacer,
+  HistoryContainer,
+  HistoryItem,
+  HistoryItemCategory,
+  HistoryItemDescription,
+  HistoryItemLeft,
+  HistoryList,
+  HistoryTime,
+  HistoryTitle,
+  HistoryToggle,
+  HistoryToggleText,
+  HistoryValue,
+  InputText,
+  InputView,
+  KeypadButton,
+  KeypadButtonText,
+  KeypadContainer,
+  KeypadRow,
+  ModalOverlay,
+  TotalText,
+  TotalView,
+} from "./AddExpensesStyles";
+import { HistoryItemProps, Props } from "../../../navigation/props";
+
+const AddExpenses: React.FC<Props> = ({ navigation }) => {
+  const [currentInput, setCurrentInput] = useState<string>("");
+  const [total, setTotal] = useState<number>(0);
+  const [history, setHistory] = useState<HistoryItemProps[]>([]);
+  const [showHistory, setShowHistory] = useState<boolean>(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>("Food");
+  const [showCategoryDropdown, setShowCategoryDropdown] =
+    useState<boolean>(false);
+  const [description, setDescription] = useState<string>("");
+  const [screenHeight, setScreenHeight] = useState<number>(
+    Dimensions.get("window").height
+  );
+
+  // Update dimensions on screen rotation or size change
+  useEffect(() => {
+    const updateLayout = (): void => {
+      setScreenHeight(Dimensions.get("window").height);
+    };
+
+    const dimensionsHandler: EmitterSubscription = Dimensions.addEventListener(
+      "change",
+      updateLayout
+    );
+
+    return () => {
+      // Clean up the event listener
+      dimensionsHandler?.remove();
+    };
+  }, []);
 
   // Predefined categories
-  const categories = ["Food", "Transportation", "School", "Personal"];
+  const categories: string[] = ["Food", "Transportation", "School", "Personal"];
 
-  const handleNumber = (num) => {
+  const handleNumber = (num: string): void => {
     setCurrentInput(currentInput + num);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (): void => {
     if (currentInput === "") return;
 
-    const value = parseFloat(currentInput);
+    const value: number = parseFloat(currentInput);
     if (!isNaN(value)) {
       // Add the current value to history with the selected category and description
-      const newHistoryItem = {
+      const newHistoryItem: HistoryItemProps = {
         value: value,
         category: selectedCategory,
         description: description,
@@ -48,8 +102,11 @@ export default function NumPadAdder() {
       };
 
       // Update the total and history
-      setTotal((prevTotal) => prevTotal + value);
-      setHistory((prevHistory) => [...prevHistory, newHistoryItem]);
+      setTotal((prevTotal: number) => prevTotal + value);
+      setHistory((prevHistory: HistoryItemProps[]) => [
+        ...prevHistory,
+        newHistoryItem,
+      ]);
 
       // Clear the current input and description
       setCurrentInput("");
@@ -57,45 +114,45 @@ export default function NumPadAdder() {
     }
   };
 
-  const handleDecimal = () => {
+  const handleDecimal = (): void => {
     if (!currentInput.includes(".")) {
       setCurrentInput(currentInput === "" ? "0." : currentInput + ".");
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = (): void => {
     if (currentInput.length > 0) {
       setCurrentInput(currentInput.slice(0, -1));
     }
   };
 
-  const handleClear = () => {
+  const handleClear = (): void => {
     setCurrentInput("");
   };
 
-  const handleClearAll = () => {
+  const handleClearAll = (): void => {
     setCurrentInput("");
     setDescription("");
     setTotal(0);
     setHistory([]);
   };
 
-  const toggleHistory = () => {
+  const toggleHistory = (): void => {
     setShowHistory(!showHistory);
-    setCurrentInput('');
-    setDescription('');
+    setCurrentInput("");
+    setDescription("");
   };
 
-  const toggleCategoryDropdown = () => {
+  const toggleCategoryDropdown = (): void => {
     setShowCategoryDropdown(!showCategoryDropdown);
   };
 
-  const selectCategory = (category) => {
+  const selectCategory = (category: string): void => {
     setSelectedCategory(category);
     setShowCategoryDropdown(false);
   };
 
-  const formatCurrency = (value) => {
+  const formatCurrency = (value: number): string => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
@@ -103,442 +160,176 @@ export default function NumPadAdder() {
     }).format(value);
   };
 
-  const renderButton = (text, onPress, buttonStyle = {}, textStyle = {}) => (
-    <TouchableOpacity style={[styles.button, buttonStyle]} onPress={onPress}>
-      <Text style={[styles.buttonText, textStyle]}>{text}</Text>
-    </TouchableOpacity>
-  );
-
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
 
-      <View style={styles.totalDisplay}>
-        <Text style={styles.totalText}>{formatCurrency(total)}</Text>
-      </View>
+      <Container>
+        <TotalView>
+          <TotalText>{formatCurrency(total)}</TotalText>
+        </TotalView>
 
-      
-      <View style={styles.inputDisplay}>
-        <Text style={styles.inputText}>
-          {currentInput
-            ? formatCurrency(parseFloat(currentInput) || 0)
-            : "$0.00"}
-        </Text>
-      </View>
+        <InputView>
+          <InputText>
+            {currentInput
+              ? formatCurrency(parseFloat(currentInput) || 0)
+              : "$0.00"}
+          </InputText>
+        </InputView>
 
-      <View style={styles.categoryContainer}>
-        <Text style={styles.categoryLabel}>Category:</Text>
-        <TouchableOpacity
-          style={styles.dropdownButton}
-          onPress={toggleCategoryDropdown}
-        >
-          <Text style={styles.dropdownButtonText}>{selectedCategory}</Text>
-          <Text style={styles.dropdownIcon}>▼</Text>
-        </TouchableOpacity>
+        {/* Middle section */}
+        <CategoryContainer>
+          <CategoryLabel>Category:</CategoryLabel>
+          <DropdownButton onPress={toggleCategoryDropdown}>
+            <DropdownButtonText>{selectedCategory}</DropdownButtonText>
+            <DropdownIcon>▼</DropdownIcon>
+          </DropdownButton>
 
-        <Modal
-          transparent={true}
-          visible={showCategoryDropdown}
-          animationType="fade"
-          onRequestClose={() => setShowCategoryDropdown(false)}
-        >
-          <TouchableWithoutFeedback
-            onPress={() => setShowCategoryDropdown(false)}
+          <Modal
+            transparent={true}
+            visible={showCategoryDropdown}
+            animationType="fade"
+            onRequestClose={() => setShowCategoryDropdown(false)}
           >
-            <View style={styles.modalOverlay}>
-              <View
-                style={[
-                  styles.dropdownList,
-                  { top: 190 }, // Position the dropdown below the button
-                ]}
-              >
-                {categories.map((category) => (
-                  <TouchableOpacity
-                    key={category}
-                    style={[
-                      styles.dropdownItem,
-                      selectedCategory === category &&
-                        styles.dropdownItemSelected,
-                    ]}
-                    onPress={() => selectCategory(category)}
-                  >
-                    <Text
-                      style={[
-                        styles.dropdownItemText,
-                        selectedCategory === category &&
-                          styles.dropdownItemTextSelected,
-                      ]}
+            <TouchableWithoutFeedback
+              onPress={() => setShowCategoryDropdown(false)}
+            >
+              <ModalOverlay>
+                <DropdownList>
+                  {categories.map((category: string) => (
+                    <DropdownItem
+                      key={category}
+                      selected={selectedCategory === category}
+                      onPress={() => selectCategory(category)}
                     >
-                      {category}
-                    </Text>
-                  </TouchableOpacity>
+                      <DropdownItemText
+                        selected={selectedCategory === category}
+                      >
+                        {category}
+                      </DropdownItemText>
+                    </DropdownItem>
+                  ))}
+                </DropdownList>
+              </ModalOverlay>
+            </TouchableWithoutFeedback>
+          </Modal>
+        </CategoryContainer>
+
+        <DescriptionContainer>
+          <DescriptionInput
+            placeholder="Enter description (optional)"
+            value={description}
+            onChangeText={setDescription}
+            placeholderTextColor="#adb5bd"
+          />
+        </DescriptionContainer>
+
+        <ActionsRow>
+          <HistoryToggle onPress={toggleHistory} activeOpacity={0.7}>
+            <HistoryToggleText>
+              {showHistory ? "Hide History" : "Show History"}
+            </HistoryToggleText>
+          </HistoryToggle>
+
+          <ClearAllToggle>
+            <ClearAllButton onPress={handleClearAll} activeOpacity={0.7}>
+              <ClearAllButtonText>Clear All</ClearAllButtonText>
+            </ClearAllButton>
+          </ClearAllToggle>
+        </ActionsRow>
+
+        {/* History Section - Conditionally Rendered */}
+        {showHistory && (
+          <HistoryContainer>
+            <HistoryTitle>History</HistoryTitle>
+            {history.length > 0 ? (
+              <HistoryList
+                showsVerticalScrollIndicator={true}
+                nestedScrollEnabled={true}
+                contentContainerStyle={{ paddingBottom: 5 }}
+              >
+                {history.map((item: HistoryItemProps, index: number) => (
+                  <HistoryItem key={index}>
+                    <HistoryItemLeft>
+                      <HistoryTime>{item.timestamp}</HistoryTime>
+                      <HistoryItemCategory>{item.category}</HistoryItemCategory>
+                      {item.description ? (
+                        <HistoryItemDescription>
+                          {item.description}
+                        </HistoryItemDescription>
+                      ) : null}
+                    </HistoryItemLeft>
+                    <HistoryValue>{formatCurrency(item.value)}</HistoryValue>
+                  </HistoryItem>
                 ))}
-              </View>
-            </View>
-          </TouchableWithoutFeedback>
-        </Modal>
-      </View>
+              </HistoryList>
+            ) : (
+              <EmptyHistoryText>No entries yet</EmptyHistoryText>
+            )}
+          </HistoryContainer>
+        )}
 
-      <View style={styles.descriptionContainer}>
-        <TextInput
-          style={styles.descriptionInput}
-          placeholder="Enter description (optional)"
-          value={description}
-          onChangeText={setDescription}
-          placeholderTextColor="#adb5bd"
-        />
-      </View>
+        {/* Flexible spacer to push keypad to bottom */}
+        <FlexSpacer />
 
-      <View style={styles.actionsRow}>
-        <TouchableOpacity
-          style={styles.historyToggle}
-          onPress={toggleHistory}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.historyToggleText}>
-            {showHistory ? "Hide History" : "Show History"}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.clearAllToggle}
-
-        <TouchableOpacity 
-          style={styles.clearAllButton} 
-          onPress={handleClearAll}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.clearAllButtonText}>Clear All</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* History Section - Conditionally Rendered */}
-      {showHistory && (
-        <View style={styles.historyContainer}>
-          <Text style={styles.historyTitle}>History</Text>
-          {history.length > 0 ? (
-            <ScrollView style={styles.historyList}>
-              {history.map((item, index) => (
-                <View key={index} style={styles.historyItem}>
-                  <View style={styles.historyItemLeft}>
-                    <Text style={styles.historyTime}>{item.timestamp}</Text>
-                    <Text style={styles.historyItemCategory}>
-                      {item.category}
-                    </Text>
-                    {item.description ? (
-                      <Text style={styles.historyItemDescription}>
-                        {item.description}
-                      </Text>
-                    ) : null}
-                  </View>
-                  <Text style={styles.historyValue}>
-                    {formatCurrency(item.value)}
-                  </Text>
-                </View>
-              ))}
-            </ScrollView>
-          ) : (
-            <Text style={styles.emptyHistoryText}>No entries yet</Text>
-          )}
-        </View>
-      )}
-
-      
-      {/* Number Pad */}
-      <View style={styles.keypadContainer}>
-        <View style={styles.row}>
-          {renderButton("7", () => handleNumber("7"))}
-          {renderButton("8", () => handleNumber("8"))}
-          {renderButton("9", () => handleNumber("9"))}
-        </View>
-        <View style={styles.row}>
-          {renderButton("4", () => handleNumber("4"))}
-          {renderButton("5", () => handleNumber("5"))}
-          {renderButton("6", () => handleNumber("6"))}
-        </View>
-        <View style={styles.row}>
-          {renderButton("1", () => handleNumber("1"))}
-          {renderButton("2", () => handleNumber("2"))}
-          {renderButton("3", () => handleNumber("3"))}
-        </View>
-        <View style={styles.row}>
-          {renderButton(".", handleDecimal)}
-          {renderButton("0", () => handleNumber("0"))}
-          {renderButton(
-            "⌫",
-            handleDelete,
-            styles.deleteButton,
-            styles.deleteButtonText
-          )}
-        </View>
-        <View style={styles.row}>
-          {renderButton("Clear", handleClear, styles.clearButton)}
-          {renderButton(
-            "Add",
-            handleSubmit,
-            styles.addButton,
-            styles.addButtonText
-          )}
-        </View>
-      </View>
-    </SafeAreaView>
+        {/* Number Pad - Now positioned at bottom */}
+        <KeypadContainer>
+          <KeypadRow>
+            <KeypadButton onPress={() => handleNumber("7")}>
+              <KeypadButtonText>7</KeypadButtonText>
+            </KeypadButton>
+            <KeypadButton onPress={() => handleNumber("8")}>
+              <KeypadButtonText>8</KeypadButtonText>
+            </KeypadButton>
+            <KeypadButton onPress={() => handleNumber("9")}>
+              <KeypadButtonText>9</KeypadButtonText>
+            </KeypadButton>
+          </KeypadRow>
+          <KeypadRow>
+            <KeypadButton onPress={() => handleNumber("4")}>
+              <KeypadButtonText>4</KeypadButtonText>
+            </KeypadButton>
+            <KeypadButton onPress={() => handleNumber("5")}>
+              <KeypadButtonText>5</KeypadButtonText>
+            </KeypadButton>
+            <KeypadButton onPress={() => handleNumber("6")}>
+              <KeypadButtonText>6</KeypadButtonText>
+            </KeypadButton>
+          </KeypadRow>
+          <KeypadRow>
+            <KeypadButton onPress={() => handleNumber("1")}>
+              <KeypadButtonText>1</KeypadButtonText>
+            </KeypadButton>
+            <KeypadButton onPress={() => handleNumber("2")}>
+              <KeypadButtonText>2</KeypadButtonText>
+            </KeypadButton>
+            <KeypadButton onPress={() => handleNumber("3")}>
+              <KeypadButtonText>3</KeypadButtonText>
+            </KeypadButton>
+          </KeypadRow>
+          <KeypadRow>
+            <KeypadButton onPress={handleDecimal}>
+              <KeypadButtonText>.</KeypadButtonText>
+            </KeypadButton>
+            <KeypadButton onPress={() => handleNumber("0")}>
+              <KeypadButtonText>0</KeypadButtonText>
+            </KeypadButton>
+            <KeypadButton isDelete={true} onPress={handleDelete}>
+              <KeypadButtonText isDelete={true}>⌫</KeypadButtonText>
+            </KeypadButton>
+          </KeypadRow>
+          <KeypadRow>
+            <KeypadButton isClear={true} onPress={handleClear}>
+              <KeypadButtonText>Clear</KeypadButtonText>
+            </KeypadButton>
+            <KeypadButton isAdd={true} onPress={handleSubmit}>
+              <KeypadButtonText isAdd={true}>Add</KeypadButtonText>
+            </KeypadButton>
+          </KeypadRow>
+        </KeypadContainer>
+      </Container>
+    </>
   );
 };
-}
-export default AddExpenses;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f8f9fa",
-  },
-  totalDisplay: {
-    padding: 15,
-    backgroundColor: "#212529",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 12,
-    margin: 10,
-    height: 80,
-  },
-  totalText: {
-    color: "white",
-    fontSize: 38,
-    fontWeight: "600",
-  },
-  inputDisplay: {
-    padding: 10,
-    backgroundColor: "#343a40",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 12,
-    margin: 10,
-    height: 50,
-  },
-  inputText: {
-    color: "white",
-    fontSize: 22,
-    fontWeight: "400",
-  },
-  categoryContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 10,
-    marginBottom: 10,
-  },
-  descriptionContainer: {
-    marginHorizontal: 10,
-    marginBottom: 10,
-  },
-  descriptionInput: {
-    backgroundColor: "white",
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: "#ced4da",
-    fontSize: 16,
-    color: "#212529",
-  },
-  categoryLabel: {
-    fontSize: 16,
-    fontWeight: "500",
-    marginRight: 10,
-    color: "#212529",
-  },
-  dropdownButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    backgroundColor: "white",
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: "#ced4da",
-    flex: 1,
-  },
-  dropdownButtonText: {
-    fontSize: 16,
-    color: "#212529",
-  },
-  dropdownIcon: {
-    fontSize: 12,
-    color: "#6c757d",
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  dropdownList: {
-    position: "absolute",
-    left: 10,
-    right: 10,
-    backgroundColor: "white",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ced4da",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    zIndex: 1000,
-  },
-  dropdownItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e9ecef",
-  },
-  dropdownItemSelected: {
-    backgroundColor: "rgba(138, 43, 226, 0.1)",
-  },
-  dropdownItemText: {
-    fontSize: 16,
-    color: "#212529",
-  },
-  dropdownItemTextSelected: {
-    color: "#8a2be2",
-    fontWeight: "500",
-  },
-  actionsRow: {
-    flexDirection: "row",
-    marginHorizontal: 10,
-    marginBottom: 10,
-  },
-  historyToggle: {
-    backgroundColor: "#8a2be2",
-    padding: 10,
-    borderRadius: 8,
-    alignItems: "center",
-    flex: 1,
-    marginRight: 5,
-  },
-  historyToggleText: {
-    color: "white",
-    fontWeight: "500",
-    fontSize: 14,
-  },
-  clearAllToggle: {
-    backgroundColor: "#e9ecef",
-  },
-  clearAllButton: {
-    backgroundColor: '#e9ecef',
-    padding: 10,
-    borderRadius: 8,
-    alignItems: "center",
-    flex: 1,
-  },
-  clearAllToggleText: {
-    color: "#dc3545",
-    fontWeight: "500",
-    fontSize: 14,
-  },
-  historyContainer: {
-    flex: 1,
-    backgroundColor: "white",
-    borderRadius: 12,
-    margin: 10,
-    padding: 10,
-    maxHeight: 200, // Increased to accommodate description text
-  },
-  historyTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 10,
-    color: "#212529",
-  },
-  historyList: {
-    flex: 1,
-  },
-  historyItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start", // Changed to align at top for descriptions
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e9ecef",
-  },
-  historyItemLeft: {
-    flex: 1,
-  },
-  historyTime: {
-    color: "#6c757d",
-    fontSize: 12,
-  },
-  historyItemCategory: {
-    color: "#343a40",
-    fontSize: 14,
-    fontWeight: "400",
-  },
-  historyItemDescription: {
-    color: "#6c757d",
-    fontSize: 12,
-    fontStyle: "italic",
-    marginTop: 2,
-  },
-  historyValue: {
-    color: "#212529",
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  emptyHistoryText: {
-    color: "#6c757d",
-    textAlign: "center",
-    marginTop: 20,
-    fontSize: 14,
-  },
-  clearAllButtonText: {
-    color: '#dc3545',
-    fontWeight: '500',
-    fontSize: 14,
-  },
-  keypadContainer: {
-    padding: 5,
-    flex: 1, // Take up remaining space
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 8,
-  },
-  button: {
-    backgroundColor: "white",
-    flex: 1,
-    height: 55,
-    borderRadius: 27.5,
-    justifyContent: "center",
-    alignItems: "center",
-    margin: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  buttonText: {
-    fontSize: 22,
-    fontWeight: "500",
-    color: "#212529",
-  },
-  deleteButton: {
-    backgroundColor: "#e9ecef",
-  },
-  deleteButtonText: {
-    color: "#dc3545",
-  },
-  clearButton: {
-    backgroundColor: "#e9ecef",
-    flex: 1,
-  },
-  addButton: {
-    backgroundColor: "#8a2be2", // Purple color similar to the image
-    flex: 1,
-  },
-  addButtonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "600",
-  },
-});
+export default AddExpenses;
