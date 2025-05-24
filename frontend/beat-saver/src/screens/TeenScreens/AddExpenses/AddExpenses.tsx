@@ -44,9 +44,6 @@ import {
   TransactionsSection,
 } from "./AddExpensesStyles";
 import { Username } from "../../AdminScreens/Dashboard/UserList/UserItemStyles";
-import { onAuthStateChanged, User } from "@firebase/auth";
-import { doc, DocumentData, onSnapshot } from "firebase/firestore";
-import { AUTH, DB } from "../../../db/firebase";
 
 const ExpenseTracker: React.FC<Props> = ({ navigation }) => {
   const [transactions, setTransactions] = useState([
@@ -103,8 +100,6 @@ const ExpenseTracker: React.FC<Props> = ({ navigation }) => {
   ]);
 
   const [showAddForm, setShowAddForm] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [teens, setTeens] = useState<DocumentData>();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [newTransaction, setNewTransaction] = useState({
@@ -113,25 +108,6 @@ const ExpenseTracker: React.FC<Props> = ({ navigation }) => {
     description: "",
     amount: "",
   });
-  const db = DB;
-
-  onAuthStateChanged(AUTH, (user) => {
-    if (user) {
-      setUser(user);
-      fetchDocument();
-    }
-  });
-
-  const fetchDocument = () => {
-    if (user) {
-      const teenUsersCollection = doc(db, "teens", user.uid);
-      onSnapshot(teenUsersCollection, (teenSnapshot) => {
-        if (teenSnapshot.exists()) {
-          setTeens(teenSnapshot.data());
-        }
-      });
-    }
-  };
 
   const totalBalance = transactions.reduce(
     (sum, transaction) => sum + transaction.amount,
@@ -260,7 +236,7 @@ const ExpenseTracker: React.FC<Props> = ({ navigation }) => {
         <Header2>
           <View>
             <Greeting>Hello</Greeting>
-            <Username>{teens ? teens.firstName : null}</Username>
+            <Username>Teenager</Username>
           </View>
           <TouchableOpacity
             style={styles.searchButton}
